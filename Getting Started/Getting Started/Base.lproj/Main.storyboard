@@ -17,32 +17,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Yu-2s-hVu" userLabel="startArchiveBtn">
-                                <rect key="frame" x="10" y="314" width="87" height="30"/>
+                                <rect key="frame" x="16" y="275" width="87" height="30"/>
                                 <state key="normal" title="Start archive">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
                             <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YM2-i5-qwZ" userLabel="videoContainer">
                                 <rect key="frame" x="0.0" y="20" width="600" height="240"/>
-                                <connections>
-                                    <segue destination="fBU-y6-uS3" kind="embed" id="6V6-d6-Ki4"/>
-                                </connections>
                             </containerView>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yJx-QN-uRq" userLabel="textChatScrollView">
-                                <rect key="frame" x="0.0" y="346" width="600" height="246"/>
-                                <subviews>
-                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="Text chat input" translatesAutoresizingMaskIntoConstraints="NO" id="yDu-Kn-0GV" userLabel="textChatInputField">
-                                        <rect key="frame" x="0.0" y="194" width="614" height="103"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                    </textView>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="PLI-Qy-hnQ">
-                                        <rect key="frame" x="150" y="61" width="300" height="123"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    </tableView>
-                                </subviews>
-                            </scrollView>
                             <button opaque="NO" contentMode="redraw" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mLu-6m-Jid">
                                 <rect key="frame" x="556" y="15" width="44" height="44"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -58,22 +40,20 @@
                             </button>
                             <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VNU-0U-P9j" userLabel="publisherContainer">
                                 <rect key="frame" x="10" y="117" width="160" height="120"/>
-                                <connections>
-                                    <segue destination="eDu-jd-92Y" kind="embed" id="vGL-90-Dqa"/>
-                                </connections>
                             </containerView>
                             <button hidden="YES" opaque="NO" contentMode="center" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S4Y-or-Dng" userLabel="swapCameraBtn">
-                                <rect key="frame" x="145" y="312" width="33" height="33.5"/>
+                                <rect key="frame" x="145" y="273" width="33" height="33.5"/>
                                 <state key="normal" title="Button" backgroundImage="camera-switch_black-33.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sAV-RL-4d9" userLabel="publisherAudioBtn">
-                                <rect key="frame" x="202" y="315" width="91" height="30"/>
-                                <state key="normal" title="Mute mic" backgroundImage="mic-24.png"/>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sAV-RL-4d9" userLabel="publisherAudioBtn">
+                                <rect key="frame" x="203" y="278" width="24" height="24"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" backgroundImage="mic_muted-24.png"/>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hpr-UX-Ad0" userLabel="subscriberAudioBtn">
-                                <rect key="frame" x="559" y="252" width="24" height="24"/>
+                                <rect key="frame" x="566" y="224" width="24" height="24"/>
                                 <state key="normal" title="Button" backgroundImage="mic_muted-24.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -88,47 +68,9 @@
                         <outlet property="subscriberAudioBtn" destination="hpr-UX-Ad0" id="6GE-L4-zCE"/>
                         <outlet property="subscriberView" destination="YM2-i5-qwZ" id="o3K-ay-Z7L"/>
                         <outlet property="swapCameraBtn" destination="S4Y-or-Dng" id="9R2-Si-55f"/>
-                        <outlet property="textChatInput" destination="yDu-Kn-0GV" id="O1L-vM-4xK"/>
-                        <outlet property="textChatScrollView" destination="yJx-QN-uRq" id="wgz-Eg-tmQ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-            </objects>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="1iV-Of-TBZ">
-            <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="fBU-y6-uS3" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="DMG-d0-6gr"/>
-                        <viewControllerLayoutGuide type="bottom" id="yfo-50-Wh0"/>
-                    </layoutGuides>
-                    <view key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="vvt-jG-V3x">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="240"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <toolbarItems/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ccB-K5-E8v" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="HjI-SS-5PX">
-            <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="eDu-jd-92Y" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="3z8-7n-4Tu"/>
-                        <viewControllerLayoutGuide type="bottom" id="d9w-tY-A1C"/>
-                    </layoutGuides>
-                    <view key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="sVs-IJ-gBQ">
-                        <rect key="frame" x="0.0" y="0.0" width="160" height="120"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <toolbarItems/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="C41-Se-TkB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
     </scenes>
@@ -136,7 +78,6 @@
         <image name="Subscriber-Speaker-Mute-35.png" width="35" height="35"/>
         <image name="archiving_on-10.png" width="10" height="10"/>
         <image name="camera-switch_black-33.png" width="33" height="33"/>
-        <image name="mic-24.png" width="24" height="24"/>
         <image name="mic_muted-24.png" width="24" height="24"/>
     </resources>
 </document>
