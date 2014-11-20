@@ -1,0 +1,1 @@
+static NSString *const kSessionCredentialsUrl = @"https://opentokrtc.com/fooo.json";
