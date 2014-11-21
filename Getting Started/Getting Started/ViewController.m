@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *archiveControlBtn;
 @property (weak, nonatomic) IBOutlet UIButton *publisherAudioBtn;
 @property (weak, nonatomic) IBOutlet UIButton *subscriberAudioBtn;
+@property (weak, nonatomic) IBOutlet UIImageView *archivingIndicatorImg;
 
 @end
 
@@ -25,17 +26,47 @@
     OTSession* _session;
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
+    
+    // Used for archive recording:
+    NSString* _archiveId;
+    NSTimer * _archiveIndicatorTimer;
 }
-static double widgetHeight = 240;
-static double widgetWidth = 320;
-static double publisherHeight = 120;
-static double publisherWidth = 160;
 
+/*
+ Set kSessionCredentialsUrl to the URL for your webservice that returns
+ the OpenTok session ID, API key, and token to be used by this client.
+ The webservice should return the data as JSON in the following form:
+
+ {
+   "sessionId":"2_MX40NDQ0MzEyMn5-fn4",
+   "apiKey":"12345",
+   "token":"T1==cGFydG5lcl9pZD00jg="
+ }
+
+ Set kStartArchiveURL to the URL for your webservice that starts recording
+ the session to an OpenTok archive:
+
+ Set kStartArchiveURL to the URL for your webservice that stops recording
+ the session to an OpenTok archive:
+
+ Set kPlaybackArchiveURL to the URL for your the page that plays back archive
+ recordings. Append the URL with a query string containing the archive ID:
+ */
+static NSString *const kSessionCredentialsUrl;
+static NSString *const kStartArchiveURL;
+static NSString *const kStopArchiveURL;
+static NSString *const kPlaybackArchiveURL;
+
+/*
+ For test purposes, if you do not have a webservice set up to provide OpenTok
+ session information, you can set the following to your OpenTok API key,
+ a test session ID, and a test token, which you can obtain at the OpenTok
+ dashboard: https://dashboard.tokbox.com
+ */
 
 NSString* _apiKey;
 NSString* _sessionId;
 NSString* _token;
-static NSString *const kSessionCredentialsUrl = @"https://opentokrtc.com/fooo.json";
 
 #pragma mark - View lifecycle
 
@@ -47,22 +78,34 @@ static NSString *const kSessionCredentialsUrl = @"https://opentokrtc.com/fooo.js
 
 - (void)getSessionCredentials
 {
-    NSURL *url = [NSURL URLWithString: kSessionCredentialsUrl];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
-    [request setHTTPMethod: @"GET"];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (error){
-            NSLog(@"Error,%@, url : %@", [error localizedDescription],kSessionCredentialsUrl);
-        }
-        else{
-            NSDictionary *roomInfo = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            _apiKey = [roomInfo objectForKey:@"apiKey"];
-            _token = [roomInfo objectForKey:@"token"];
-            _sessionId = [roomInfo objectForKey:@"sid"];
-            [self doConnect];
-        }
-    }];
+    if (!_apiKey || !_sessionId || !_token) {
+        // Get the OpenTok API key and a session ID and token from the web service
+        NSURL *url = [NSURL URLWithString: kSessionCredentialsUrl];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
+        [request setHTTPMethod: @"GET"];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+            if (error){
+                NSLog(@"Error,%@, URL: %@", [error localizedDescription],kSessionCredentialsUrl);
+            }
+            else{
+                NSDictionary *roomInfo = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                _apiKey = [roomInfo objectForKey:@"apiKey"];
+                _token = [roomInfo objectForKey:@"token"];
+                _sessionId = [roomInfo objectForKey:@"sessionId"];
+                
+                if(!_apiKey || !_token || !_sessionId) {
+                    NSLog(@"Error invalid response from server, URL: %@",kSessionCredentialsUrl);
+                } else {
+                    [self doConnect];
+                }
+            }
+        }];
+    } else {
+        // Use the hardcoded API key, session ID, and token values,
+        // which you should not do in a shipping application.
+        [self doConnect];
+    }
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -121,10 +164,15 @@ static NSString *const kSessionCredentialsUrl = @"https://opentokrtc.com/fooo.js
               error.localizedDescription);
     }
     
-    [_publisher.view setFrame:CGRectMake(0, 0, publisherWidth, publisherHeight)];
+    [_publisher.view setFrame:CGRectMake(0, 0, _publisherView.bounds.size.width,
+                                         _publisherView.bounds.size.height)];
     [_publisherView addSubview:_publisher.view];
 
     _archiveControlBtn.hidden = NO;
+    [_archiveControlBtn addTarget:self
+                           action:@selector(startArchive)
+                 forControlEvents:UIControlEventTouchUpInside];
+    
     _publisherAudioBtn.hidden = NO;
     [_publisherAudioBtn addTarget:self
                           action:@selector(togglePublisherMic)
@@ -134,6 +182,67 @@ static NSString *const kSessionCredentialsUrl = @"https://opentokrtc.com/fooo.js
     [_swapCameraBtn addTarget:self
                action:@selector(swapCamera)
      forControlEvents:UIControlEventTouchUpInside];
+}
+
+-(void)startArchive
+{
+    _archiveControlBtn.hidden = YES;
+    NSURL *url = [NSURL URLWithString: kStartArchiveURL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
+    [request setHTTPMethod: @"GET"];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        if (error){
+            NSLog(@"Error starting the archive: %@. URL : %@",
+                  [error localizedDescription],
+                  kStartArchiveURL);
+        }
+        else{
+            NSLog(@"Web service call to start the archive: %@", kStartArchiveURL);
+        }
+    }];
+}
+
+-(void)stopArchive
+{
+    _archiveControlBtn.hidden = YES;
+    NSString *fullURL = kStopArchiveURL;
+    fullURL = [fullURL stringByAppendingString:@"/"];
+    fullURL = [fullURL stringByAppendingString:_archiveId];
+    NSURL *url = [NSURL URLWithString: fullURL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
+    [request setHTTPMethod: @"GET"];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        if (error){
+            NSLog(@"Error stopping the archive: %@. URL : %@",
+                  [error localizedDescription],fullURL);
+        }
+        else{
+            NSLog(@"Web service call to stop the archive: %@", fullURL);
+        }
+    }];
+}
+
+- (void) blinkArchiveIndicator
+{
+    _archiveIndicatorTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0
+                                                              target: self
+                                                            selector:@selector(onArchiveIndicatorTimerTick)
+                                                            userInfo: nil repeats:YES];
+}
+
+-(void) onArchiveIndicatorTimerTick
+{
+    _archivingIndicatorImg.hidden = !_archivingIndicatorImg.hidden;
+}
+
+-(void)loadArchivePlaybackInBrowser
+{
+    NSString *fullURL = kPlaybackArchiveURL;
+    fullURL = [fullURL stringByAppendingString:@"?archiveId="];
+    fullURL = [fullURL stringByAppendingString:_archiveId];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fullURL]];
 }
 
 -(void)togglePublisherMic
@@ -264,9 +373,10 @@ didFailWithError:(OTError*)error
 {
     NSLog(@"subscriberDidConnectToStream (%@)",
           subscriber.stream.connection.connectionId);
-    [_subscriber.view setFrame:CGRectMake(0, 0, widgetWidth,
-                                          widgetHeight)];
+    [_subscriber.view setFrame:CGRectMake(0, 0, _subscriberView.bounds.size.width,
+                                          _subscriberView.bounds.size.height)];
     [_subscriberView addSubview:_subscriber.view];
+    _subscriberAudioBtn.hidden = NO;
 }
 
 - (void)subscriber:(OTSubscriberKit*)subscriber
@@ -308,22 +418,26 @@ archiveStartedWithId:(NSString *)archiveId
 name:(NSString *)name
 {
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
-    /*
-     TBExampleOverlayView *overlayView =
-     [(TBExampleVideoView *)[_publisher view] overlayView];
-     [overlayView startArchiveAnimation];
-     */
+    _archiveId = archiveId;
+    [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
+    _archiveControlBtn.hidden = NO;
+    [_archiveControlBtn addTarget:self
+                           action:@selector(stopArchive)
+                 forControlEvents:UIControlEventTouchUpInside];
+    [self blinkArchiveIndicator];
 }
 
 - (void)     session:(OTSession*)session
 archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped with id:%@", archiveId);
-    /*
-     TBExampleOverlayView *overlayView =
-     [(TBExampleVideoView *)[_publisher view] overlayView];
-     [overlayView stopArchiveAnimation];
-     */
+    [_archiveIndicatorTimer invalidate];
+    _archivingIndicatorImg.hidden = YES;
+    [_archiveControlBtn setTitle: @"View archive" forState:UIControlStateNormal];
+    _archiveControlBtn.hidden = NO;
+    [_archiveControlBtn addTarget:self
+                           action:@selector(loadArchivePlaybackInBrowser)
+                 forControlEvents:UIControlEventTouchUpInside];
 }
 
 @end

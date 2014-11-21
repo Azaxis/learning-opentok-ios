@@ -37,9 +37,9 @@ TODO -- describe these OpenTok concepts.
 The web service returns an HTTP response with JSON data like the following:
 
     {
-      "sessionId":"2_MX40NDQ0MzEyMn5-U3VuIE1heSAxMSAxMTo0Mzo0OSBQRFQgMjAxNH4wLjM0MDc4NDEzfn4",
-      "apiKey":"44443122",
-      "token":"T1==cGFydG5lcl9pZD00NDQ0MzEyMiZzaWc9MTVjZTFlNDgzNGYzODZmM2I5YzA4M2ZmMzQwODhiMDBmZTk1MWE4ZTpzZXNzaW9uX2lkPTJfTVg0ME5EUTBNekV5TW41LVUzVnVJRTFoZVNBeE1TQXhNVG8wTXpvME9TQlFSRlFnTWpBeE5INHdMak0wTURjNE5ERXpmbjQmY3JlYXRlX3RpbWU9MTQxNjQyNTQ2OCZub25jZT0wLjM5MTE1MzIwMzc4OTE0NDc1JnJvbGU9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0MTY1MTE4Njg="
+      "sessionId":"2_MX40NDQ0MzEyMn5-fn4",
+      "apiKey":"12345",
+      "token":"T1==cGFydG5lcl9pZD00jg="
     }
 
 Connecting to the session
