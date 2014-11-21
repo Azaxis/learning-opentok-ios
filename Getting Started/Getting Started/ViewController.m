@@ -26,10 +26,7 @@
     OTSession* _session;
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
-    
-    // Used for archive recording:
     NSString* _archiveId;
-    NSTimer * _archiveIndicatorTimer;
 }
 
 /*
@@ -223,19 +220,6 @@ NSString* _token;
             NSLog(@"Web service call to stop the archive: %@", fullURL);
         }
     }];
-}
-
-- (void) blinkArchiveIndicator
-{
-    _archiveIndicatorTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0
-                                                              target: self
-                                                            selector:@selector(onArchiveIndicatorTimerTick)
-                                                            userInfo: nil repeats:YES];
-}
-
--(void) onArchiveIndicatorTimerTick
-{
-    _archivingIndicatorImg.hidden = !_archivingIndicatorImg.hidden;
 }
 
 -(void)loadArchivePlaybackInBrowser
@@ -460,19 +444,18 @@ name:(NSString *)name
 {
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
+    _archivingIndicatorImg.hidden = NO;
     [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
     _archiveControlBtn.hidden = NO;
     [_archiveControlBtn addTarget:self
                            action:@selector(stopArchive)
                  forControlEvents:UIControlEventTouchUpInside];
-    [self blinkArchiveIndicator];
 }
 
 - (void)     session:(OTSession*)session
 archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped with id:%@", archiveId);
-    [_archiveIndicatorTimer invalidate];
     _archivingIndicatorImg.hidden = YES;
     [_archiveControlBtn setTitle: @"View archive" forState:UIControlStateNormal];
     _archiveControlBtn.hidden = NO;
