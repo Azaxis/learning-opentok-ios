@@ -9,7 +9,7 @@
 #import <OpenTok/OpenTok.h>
 
 @interface ViewController ()
-<OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate>
+<OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate, UITextViewDelegate>
 @property (weak, nonatomic) IBOutlet UIView *subscriberView;
 @property (weak, nonatomic) IBOutlet UIView *publisherView;
 @property (weak, nonatomic) IBOutlet UIScrollView *textChatScrollView;
@@ -19,6 +19,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *publisherAudioBtn;
 @property (weak, nonatomic) IBOutlet UIButton *subscriberAudioBtn;
 @property (weak, nonatomic) IBOutlet UIImageView *archivingIndicatorImg;
+@property (weak, nonatomic) IBOutlet UIScrollView *chatScrollView;
+@property (weak, nonatomic) IBOutlet UITextView *chatTextInputView;
 
 @end
 
@@ -73,6 +75,7 @@ NSString* _token;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _chatTextInputView.delegate = self;
     [self getSessionCredentials];
 }
 
@@ -304,12 +307,51 @@ NSString* _token;
     _subscriber = nil;
 }
 
+- (void) sendChatMessage
+{
+    OTError* error = nil;
+    [_session signalWithType:@"chat" string:_chatTextInputView.text connection:nil error:&error];
+    if (error) {
+        NSLog(@"Signal error: %@", error);
+    } else {
+        NSLog(@"Signal sent: %@", _chatTextInputView.text);
+    }
+    _chatTextInputView.text = @"";
+}
+
+- (void)logSignalString:(NSString*)string fromSelf:(Boolean)fromSelf {
+    UIColor* backgroundColor = [UIColor whiteColor];
+    if (fromSelf) {
+        backgroundColor = [UIColor colorWithRed:0.81 green:0.89 blue:0.95 alpha:1.0];
+    }
+    UITextView* textView =
+    [[UITextView alloc]initWithFrame:CGRectMake(0,
+                                                0,
+                                                _chatScrollView.bounds.size.width,
+                                                80)];
+    textView.font = [UIFont fontWithName:@"Helvetica" size:12];
+    textView.font = [UIFont boldSystemFontOfSize:12];
+    textView.backgroundColor = backgroundColor;
+    textView.textColor = [UIColor blackColor];
+    textView.scrollEnabled = NO;
+    textView.pagingEnabled = YES;
+    textView.editable = NO;
+    textView.text = string;
+    
+    CGRect frame = textView.frame;
+    frame.size.height = [textView contentSize].height;
+    textView.frame = frame;
+    
+    [_chatScrollView addSubview:textView];
+}
+
 # pragma mark - OTSession delegate callbacks
 
 - (void)sessionDidConnect:(OTSession*)session
 {
     // We have successfully connected, now start pushing an audio-video stream
     // to the OpenTok session.
+    _chatTextInputView.hidden = NO;
 
     [self doPublish];
 }
@@ -330,6 +372,7 @@ streamCreated:(OTStream *)stream
     if (nil == _subscriber)
     {
         [self doSubscribe:stream];
+        _chatTextInputView.hidden = NO;
     }
 }
 
@@ -438,6 +481,50 @@ archiveStoppedWithId:(NSString *)archiveId
     [_archiveControlBtn addTarget:self
                            action:@selector(loadArchivePlaybackInBrowser)
                  forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)session:(OTSession*)session receivedSignalType:(NSString*)type fromConnection:(OTConnection*)connection withString:(NSString*)string {
+    NSLog(@"Received signal %@", string);
+    Boolean fromSelf = NO;
+    if ([connection.connectionId isEqualToString:session.connection.connectionId]) {
+        fromSelf = YES;
+    }
+    [self logSignalString:string fromSelf:fromSelf];
+}
+
+# pragma mark - UITextViewDelegate callbacks
+
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
+    _chatTextInputView.text = @"";
+    return YES;
+}
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+    NSCharacterSet *doneButtonCharacterSet = [NSCharacterSet newlineCharacterSet];
+    NSRange replacementTextRange = [text rangeOfCharacterFromSet:doneButtonCharacterSet];
+    NSUInteger location = replacementTextRange.location;
+    
+    if (textView.text.length + text.length > 140){
+        if (location != NSNotFound){
+            [textView resignFirstResponder];
+            [self sendChatMessage];
+        }
+        return NO;
+    }
+    else if (location != NSNotFound){
+        [textView resignFirstResponder];
+        [self sendChatMessage];
+        return NO;
+    }
+    return YES;
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    NSLog(@"touchesBegan:withEvent:");
+    [self.view endEditing:YES];
+    [super touchesBegan:touches withEvent:event];
 }
 
 @end

@@ -49,12 +49,23 @@
                             <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="archiving_on-10.png" translatesAutoresizingMaskIntoConstraints="NO" id="Hui-cB-DD6" userLabel="Archiving Indicator">
                                 <rect key="frame" x="10" y="10" width="10" height="11"/>
                             </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PBi-sA-0IS" userLabel="Chat Scroll View">
+                                <rect key="frame" x="10" y="314" width="574" height="212"/>
+                            </scrollView>
+                            <textView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="Enter text chat message here." translatesAutoresizingMaskIntoConstraints="NO" id="QSk-b0-GdB">
+                                <rect key="frame" x="16" y="534" width="568" height="37"/>
+                                <color key="backgroundColor" red="0.91930621603260865" green="0.91930621603260865" blue="0.91930621603260865" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
                         <outlet property="archiveControlBtn" destination="6Yu-2s-hVu" id="sV6-9o-t3d"/>
                         <outlet property="archivingIndicatorImg" destination="Hui-cB-DD6" id="tfq-9N-eEf"/>
+                        <outlet property="chatScrollView" destination="PBi-sA-0IS" id="oiU-OF-5DG"/>
+                        <outlet property="chatTextInputView" destination="QSk-b0-GdB" id="bD7-wJ-DF8"/>
                         <outlet property="publisherAudioBtn" destination="sAV-RL-4d9" id="kXS-ju-VZt"/>
                         <outlet property="publisherView" destination="VNU-0U-P9j" id="rgu-QX-C61"/>
                         <outlet property="subscriberAudioBtn" destination="hpr-UX-Ad0" id="6GE-L4-zCE"/>
