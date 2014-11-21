@@ -12,9 +12,7 @@
 <OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate, UITextViewDelegate>
 @property (weak, nonatomic) IBOutlet UIView *subscriberView;
 @property (weak, nonatomic) IBOutlet UIView *publisherView;
-@property (weak, nonatomic) IBOutlet UIScrollView *textChatScrollView;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraBtn;
-@property (weak, nonatomic) IBOutlet UITextView *textChatInput;
 @property (weak, nonatomic) IBOutlet UIButton *archiveControlBtn;
 @property (weak, nonatomic) IBOutlet UIButton *publisherAudioBtn;
 @property (weak, nonatomic) IBOutlet UIButton *subscriberAudioBtn;
@@ -326,9 +324,9 @@ NSString* _token;
     }
     UITextView* textView =
     [[UITextView alloc]initWithFrame:CGRectMake(0,
-                                                0,
-                                                _chatScrollView.bounds.size.width,
-                                                80)];
+                                                (_chatScrollView.subviews.count - 2) * 40,
+                                                _chatScrollView.bounds.size.width - 20,
+                                                40)];
     textView.font = [UIFont fontWithName:@"Helvetica" size:12];
     textView.font = [UIFont boldSystemFontOfSize:12];
     textView.backgroundColor = backgroundColor;
