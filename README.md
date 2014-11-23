@@ -3,11 +3,11 @@ OpenTok iOS SDK Getting Started Sample App
 
 This sample app shows how to accomplish basic tasks using the OpenTok iOS SDK.
 It connects the user with another client so that they can share an OpenTok audio-video
-chat session. Additionally, the app uses the OpenTok API to provide the following:
+chat session. Additionally, the app uses the OpenTok iOS SDK to implement the following:
 
 * Controls for muting the audio of each participant
 * A control for switching the camera used (between the front and back)
-* A text chat panel
+* Text chat for the participants
 * The ability to record the chat session, stop the recording, and view the recording
 
 Configuring the application
@@ -35,24 +35,27 @@ the session. Think of a session as a room, in which clients meet. Depending on t
 new session IDs for new groups of clients.
 
 *Important:* This demo application assumes that only two clients -- the local iOS client and another
-client -- will connect in the same OpenTok session. It is up to your server-side code to create a
-unique session ID for each pair of clients. In other applications, you may want to connect some
-clients in one OpenTok session (for instance, a meeting room), and others in another session
-(another meeting room).
+client -- will connect in the same OpenTok session. For test purposes, you can reuse the same
+session ID each time two clients connect. However, in a production application, your server-side
+code must create a unique session ID for each pair of clients. In other applications, you may want
+to connect many clients in one OpenTok session (for instance, a meeting room) and connect others
+in another session (another meeting room). For examples of apps that connect users in different
+ways, see the OpenTok ScheduleKit, Presence Kit, and Link Kit [Starter Kit apps] [2].
 
 Since this app uses the OpenTok archiving feature to record the session, the session must be set
 to use the `routed` media mode, indicating that it will use the OpenTok Media Router. The OpenTok
-Media Router provides other advanced features (see [The OpenTok Media Router and media modes] [2]).
+Media Router provides other advanced features (see [The OpenTok Media Router and media modes] [3]).
 If your application does not require the features provided by the OpenTok Media Router, you can set
 the media mode to `relayed`.
 
 **Token** -- The client also needs a token, which grants them access to the session. Each client is
-issued a unique token when they connect to the session.
+issued a unique token when they connect to the session. Since the user publishes an audio-video stream to the session, the token generated must include the publish role (the default). For more
+information about tokens, see the OpenTok [Token creation overview] [4].
 
 **API key** -- The API key identifies your OpenTok developer account.
 
-Upon starting up, the application calls the `[self getSessionCredentials]` method (defined in
-the ViewController.m file). This method calls a web service that provides an OpenTok session ID,API key, and token to be used by the client. Set URL of the web service in the `kSessionCredentialsUrl`
+Upon starting up, the application calls the `[self getSessionCredentials:]` method (defined in the
+ViewController.m file). This method calls a web service that provides an OpenTok session ID, API key, and token to be used by the client. Set URL of the web service in the `kSessionCredentialsUrl`
 property (also in the ViewController.m file):
 
     static NSString *const kSessionCredentialsUrl = @"https://your_web_service_url";
@@ -77,7 +80,7 @@ at the beginning of the ViewController.m file:
     NSString* _token @"T1==cGFydG5lcl9pZD00jg=";
 
 You can obtain your API key as well as test values for the session ID and token at the
-[OpenTok dashboard] [3]. If you set these hard-coded values, the application uses these values
+[OpenTok dashboard] [4]. If you set these hard-coded values, the application uses these values
 instead of retrieving them from the web service. However in a production application, you will
 always want to use a web service to obtain a unique token each time a user connects to an OpenTok
 session.
@@ -98,6 +101,9 @@ web service calls that start archive recording, stop recording, and play back th
     static NSString *const kStopArchiveURL = @"";
     static NSString *const kPlaybackArchiveURL = @"";
 
+If you do not set these strings, the *Start recording*, *Stop Recording*, and *View archive*
+buttons will not be available in the app.
+
 See the PHP Getting Started sample for sample server-side PHP code for OpenTok archiving.
 (TODO: Add a link.)
 
@@ -109,29 +115,25 @@ previous section), you can test the application:
 
 1. In XCode, launch the app in a connected iOS device or in the iOS simulator.
 
-   The app uses the API key, token and session ID to connect to an OpenTok session, and *publishes*
-   an audio-video *stream* to the session. Other clients can *subscribe* to the stream you
-   publish.
-
 2. On first run, the app asks you for access to the camera:
 
-   Getting Started would like to Access the Camera: Don't Allow / OK
+     Getting Started would like to Access the Camera: Don't Allow / OK
 
    iOS OS requires apps to automatically ask the user to grant camera permission to an app.
 
    The published stream appears in the lower-lefthand corner of the video view. (The main storyboard
    of the app defines many of the views and UI controls used by the app.)
 
-3. Now close the app, and find the test.html in the root of the project. You will use the test.html
-   file (in located in the root directory of this project), to connect to the OpenTok session and
-   publish an audio-video stream from a web browser:
+3. Now close the app and find the test.html file in the root of the project. You will use the
+   test.html file (in located in the root directory of this project), to connect to the OpenTok
+   session and publish an audio-video stream from a web browser:
 
    * Edit the test.html file and set the `sessionCredentialsUrl` variable to match the
-     `ksessionCredentialsUrl` property used in the iOS app. Or, if you are using hard-coded
-     session ID, token, and API key settings, set the `apiKey`,`sessionId`, and `token` variables.
+     `ksessionCredentialsUrl` property used in the iOS app. Or -- if you are using hard-coded
+     session ID, token, and API key settings -- set the `apiKey`,`sessionId`, and `token` variables.
 
-   * Add the test.html file to a web server. (You cannot run WebRTC
-     video in web pages loaded from the desktop.)
+   * Add the test.html file to a web server. (You cannot run WebRTC videos in web pages loaded
+     from the desktop.)
 
    * In a browser, load the test.html file from the web server.
 
@@ -149,7 +151,7 @@ previous section), you can test the application:
 
 7. Click the swap camera button (below the video views).
 
-   This changes the camera used (between front and back) for the published stream.
+   This toggles the camera used (between front and back) for the published stream.
 
 8. Click in the text chat input field (labeled "Enter text chat message here"), enter a text
    chat message and tap the Return button.
@@ -157,11 +159,13 @@ previous section), you can test the application:
    The text chat message is sent to the web client. You can also send a chat message from the web
    client to the iOS client.
 
-9. Tap the Start Archive button.
+9. Tap the *Start recording* button.
 
    This starts recording the audio video streams on the OpenTok Media Server.
 
-10. Click the Stop Archive button to stop the recording.
+10. Click the *Stop recording* button to stop the recording.
+
+11. Click the *View recording* button to view the recording in the web browser.
 
 Read the following section to learn how to use the OpenTok iOS SDK to accomplish these tasks.
 
@@ -186,7 +190,7 @@ initialize an OTSession object and connect to the OpenTok session:
         }
     }
 
-The OTSession object (`_session`), defined by the OpenTok iSO SDK, represents the OpenTok session
+The OTSession object (`_session`), defined by the OpenTok iOS SDK, represents the OpenTok session
 (which connects users).
 
 The `[OTSession connectWithToken:error]` method connects the iOS app to the OpenTok session.
@@ -229,10 +233,18 @@ to the session:
               error.localizedDescription);
     }
 
-The code sets up `self` to be the object that implements the OTPublisherDelegate
-methods, which are called for publisher-related events.
+It then adds the publisher's view, which contains its video, as a subview of the
+`_publisherView` UIView element, defined in the main storyboard.
 
-Upon successfully publishing the stream, the following delegate method is called:
+    [_publisher.view setFrame:CGRectMake(0, 0, _publisherView.bounds.size.width,
+                                       _publisherView.bounds.size.height)];
+    [_publisherView addSubview:_publisher.view];
+
+This app sets `self` to implement the OTPublisherDelegate interface and receive publisher-related
+events.
+
+Upon successfully publishing the stream, the implementation of the
+`[OTPublisherDelegate publisher:streamCreated]`  method is called:
 
     - (void)publisher:(OTPublisherKit *)publisher
     streamCreated:(OTStream *)stream
@@ -240,17 +252,21 @@ Upon successfully publishing the stream, the following delegate method is called
         NSLog(@"Now publishing.");
     }
 
-Upon an asynchronous error in publishing the stream, the following delegate method is called:
+If the publisher stops sending its stream to the session, the implementation of the
+`[OTPublisherDelegate publisher:streamDestroyed]` method is called:
 
     - (void)publisher:(OTPublisherKit*)publisher
     streamDestroyed:(OTStream *)stream
     {
-        if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
-        {
-            [self cleanupSubscriber];
-        }
-
         [self cleanupPublisher];
+    }
+
+The `[self cleanupPublisher:]` method removes the publisher's view (its video) from its
+superview:
+
+    - (void)cleanupPublisher {
+        [_publisher.view removeFromSuperview];
+        _publisher = nil;
     }
 
 Subscribing to another client's audio-video stream
@@ -272,7 +288,7 @@ the session. The app implements this delegate method with the following:
 
 The method is passed an OTStream object (defined by the OpenTok iOS SDK), representing the stream
 that another client is publishing. Although this app assumes that only one other client is
-connecting to the session and publishing.) The method checks to see if the app is already
+connecting to the session and publishing, the method checks to see if the app is already
 subscribing to a stream (if the `_subscriber` property is set). If not, the session calls `[self doSubscribe:stream]`, passing in the OTStream object (for the new stream):
 
     - (void)doSubscribe:(OTStream*)stream
@@ -312,7 +328,7 @@ storyboard:
     }
 
 It also displays the input text field for the text chat. The app hides this field until
-you can view the other client starts publishing a stream in the session.
+you start viewing the other client's audio-video stream.
 
 Muting the publisher and subscriber
 -----------------------------------
@@ -320,7 +336,7 @@ Muting the publisher and subscriber
 When the user clicks the toggle publisher audio button, the `[self togglePublisherMic]`
 method is called:
 
-   -(void)togglePublisherMic
+    -(void)togglePublisherMic
     {
         _publisher.publishAudio = !_publisher.publishAudio;
         if (_publisher.publishAudio) {
@@ -348,7 +364,7 @@ Changing the camera used by the publisher
 
 When the user clicks the toggle camera button, the `[self swapCamra]` method is called:
 
-   -(void)swapCamera
+    -(void)swapCamera
     {
         if (_publisher.cameraPosition == AVCaptureDevicePositionFront) {
             _publisher.cameraPosition = AVCaptureDevicePositionBack;
@@ -474,10 +490,19 @@ the session.
 Other resources
 ---------------
 
-TODO
+See the following:
 
+* [API reference] [7] -- Provides details on the OpenTok iOS SDK API
+* [Tutorials] [8] -- Includes conceptual information and code samples for all OpenTok features
+* [Sample code] [9] (Also included in the OpenTok iOS SDK download) -- Includes sample apps
+  that show more features of the OpenTok iOS SDK
 
 [1]: https://tokbox.com/opentok/libraries/client/ios/
-[2]: https://tokbox.com/opentok/tutorials/create-session/#media-mode
-[3]: https://dashboard.tokbox.com
-[4]: https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureDevice_Class
+[2]: https://tokbox.com/opentok/starter-kits/
+[3]: https://tokbox.com/opentok/tutorials/create-session/#media-mode
+[4]: https://tokbox.com/opentok/tutorials/create-token/
+[5]: https://dashboard.tokbox.com
+[6]: https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureDevice_Class
+[7]: https://tokbox.com/opentok/libraries/client/ios/reference/
+[8]: https://tokbox.com/opentok/tutorials/
+[9]: https://github.com/opentok/opentok-ios-sdk-samples
