@@ -49,10 +49,10 @@
  Set kPlaybackArchiveURL to the URL for your the page that plays back archive
  recordings. Append the URL with a query string containing the archive ID:
  */
-static NSString *const kSessionCredentialsUrl;
-static NSString *const kStartArchiveURL;
-static NSString *const kStopArchiveURL;
-static NSString *const kPlaybackArchiveURL;
+static NSString *const kSessionCredentialsUrl = @"";
+static NSString *const kStartArchiveURL = @"";
+static NSString *const kStopArchiveURL = @"";
+static NSString *const kPlaybackArchiveURL = @"";
 
 /*
  For test purposes, if you do not have a webservice set up to provide OpenTok
@@ -101,7 +101,7 @@ NSString* _token;
         }];
     } else {
         // Use the hardcoded API key, session ID, and token values,
-        // which you should not do in a shipping application.
+        // which you should not do in a production application.
         [self doConnect];
     }
 }
@@ -239,11 +239,17 @@ NSString* _token;
         [_publisherAudioBtn setTitle: @"Unute mic" forState:UIControlStateNormal];
     }
 }
+
+-(void)toggleSubscriberAudio
+{
+    _subscriber.subscribeToAudio = !_subscriber.subscribeToAudio;
+}
+
 -(void)swapCamera
 {
     if (_publisher.cameraPosition == AVCaptureDevicePositionFront) {
         _publisher.cameraPosition = AVCaptureDevicePositionBack;
-    } else if (_publisher.cameraPosition == AVCaptureDevicePositionBack) {
+    } else {
         _publisher.cameraPosition = AVCaptureDevicePositionFront;
     }
 }
@@ -278,10 +284,7 @@ NSString* _token;
 }
 
 /**
- * Cleans the subscriber from the view hierarchy, if any.
- * NB: You do *not* have to call unsubscribe in your controller in response to
- * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
- * be automatically removed from the session during cleanup of the stream.
+ * Cleans the subscriber from the view hierarchy.
  */
 - (void)cleanupSubscriber
 {
@@ -333,8 +336,6 @@ NSString* _token;
 {
     // We have successfully connected, now start pushing an audio-video stream
     // to the OpenTok session.
-    _chatTextInputView.hidden = NO;
-
     [self doPublish];
 }
 
@@ -346,7 +347,7 @@ NSString* _token;
     NSLog(@"sessionDidDisconnect (%@)", alertMessage);
 }
 
-- (void)session:(OTSession*)mySession
+- (void)session:(OTSession*)session
 streamCreated:(OTStream *)stream
 {
     NSLog(@"session streamCreated (%@)", stream.streamId);
@@ -354,7 +355,6 @@ streamCreated:(OTStream *)stream
     if (nil == _subscriber)
     {
         [self doSubscribe:stream];
-        _chatTextInputView.hidden = NO;
     }
 }
 
@@ -366,6 +366,7 @@ streamDestroyed:(OTStream *)stream
     if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
     {
         [self cleanupSubscriber];
+        _chatTextInputView.hidden = YES;
     }
 }
 
@@ -392,55 +393,9 @@ didFailWithError:(OTError*)error
     NSLog(@"didFailWithError: (%@)", error);
 }
 
-# pragma mark - OTSubscriber delegate callbacks
-
-- (void)subscriberDidConnectToStream:(OTSubscriberKit*)subscriber
-{
-    NSLog(@"subscriberDidConnectToStream (%@)",
-          subscriber.stream.connection.connectionId);
-    [_subscriber.view setFrame:CGRectMake(0, 0, _subscriberView.bounds.size.width,
-                                          _subscriberView.bounds.size.height)];
-    [_subscriberView addSubview:_subscriber.view];
-    _subscriberAudioBtn.hidden = NO;
-}
-
-- (void)subscriber:(OTSubscriberKit*)subscriber
-didFailWithError:(OTError*)error
-{
-    NSLog(@"subscriber %@ didFailWithError %@",
-          subscriber.stream.streamId,
-          error);
-}
-
-# pragma mark - OTPublisher delegate callbacks
-
-- (void)publisher:(OTPublisherKit *)publisher
-streamCreated:(OTStream *)stream
-{
-    NSLog(@"Now publishing.");
-}
-
-- (void)publisher:(OTPublisherKit*)publisher
-streamDestroyed:(OTStream *)stream
-{
-    if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
-    {
-        [self cleanupSubscriber];
-    }
-    
-    [self cleanupPublisher];
-}
-
-- (void)publisher:(OTPublisherKit*)publisher
-didFailWithError:(OTError*) error
-{
-    NSLog(@"publisher didFailWithError %@", error);
-    [self cleanupPublisher];
-}
-
 - (void)     session:(OTSession*)session
 archiveStartedWithId:(NSString *)archiveId
-name:(NSString *)name
+                name:(NSString *)name
 {
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
@@ -471,6 +426,53 @@ archiveStoppedWithId:(NSString *)archiveId
         fromSelf = YES;
     }
     [self logSignalString:string fromSelf:fromSelf];
+}
+
+# pragma mark - OTPublisher delegate callbacks
+
+- (void)publisher:(OTPublisherKit *)publisher
+streamCreated:(OTStream *)stream
+{
+    NSLog(@"Now publishing.");
+}
+
+- (void)publisher:(OTPublisherKit*)publisher
+streamDestroyed:(OTStream *)stream
+{
+    [self cleanupPublisher];
+}
+
+- (void)publisher:(OTPublisherKit*)publisher
+didFailWithError:(OTError*) error
+{
+    NSLog(@"publisher didFailWithError %@", error);
+    [self cleanupPublisher];
+}
+
+# pragma mark - OTSubscriber delegate callbacks
+
+- (void)subscriberDidConnectToStream:(OTSubscriberKit*)subscriber
+{
+    NSLog(@"subscriberDidConnectToStream (%@)",
+          subscriber.stream.connection.connectionId);
+    [_subscriber.view setFrame:CGRectMake(0, 0, _subscriberView.bounds.size.width,
+                                          _subscriberView.bounds.size.height)];
+    [_subscriberView addSubview:_subscriber.view];
+    
+    _subscriberAudioBtn.hidden = NO;
+    [_subscriberAudioBtn addTarget:self
+                           action:@selector(toggleSubscriberAudio)
+                 forControlEvents:UIControlEventTouchUpInside];
+
+    _chatTextInputView.hidden = NO;
+}
+
+- (void)subscriber:(OTSubscriberKit*)subscriber
+  didFailWithError:(OTError*)error
+{
+    NSLog(@"subscriber %@ didFailWithError %@",
+          subscriber.stream.streamId,
+          error);
 }
 
 # pragma mark - UITextViewDelegate callbacks

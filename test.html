@@ -38,27 +38,44 @@ var sessionCredentialsUrl = 'http://75d8a34b.ngrok.com/session',
     startArchiveUrl = 'http://75d8a34b.ngrok.com/start',
     stopArchiveUrl = 'http://75d8a34b.ngrok.com/stop/';
 
-var xhr = new XMLHttpRequest();
-xhr.open("GET", sessionCredentialsUrl, true);
-xhr.onload = function (e) {
-  if (xhr.readyState === 4) {
-    if (xhr.status === 200) {
-      openTokSessionInfo = JSON.parse(xhr.responseText);
-      apiKey = openTokSessionInfo.apiKey;
-      sessionId = openTokSessionInfo.sessionId;
-      token = openTokSessionInfo.token;
-      initSession();
-    } else {
-      console.error(xhr.statusText);
-    }
-  }
-};
-xhr.onerror = function (e) {
-  console.error(xhr.statusText);
-};
-xhr.send(null);
+/*
+ For test purposes, if you do not have a webservice set up to provide OpenTok
+ session information, you can set the following to your OpenTok API key,
+ a test session ID, and a test token, which you can obtain at the OpenTok
+ dashboard: https://dashboard.tokbox.com
+ */
 
-OT.setLogLevel(OT.NONE);
+var apiKey = '3';
+var sessionId = 'r';
+var token = 'sdf';
+
+if (!apiKey || !sessionId || !token) {
+  getApiKeyAndToken()
+} else {
+  initSession();
+}
+
+function getApiKeyAndToken() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", sessionCredentialsUrl, true);
+  xhr.onload = function (e) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        openTokSessionInfo = JSON.parse(xhr.responseText);
+        apiKey = openTokSessionInfo.apiKey;
+        sessionId = openTokSessionInfo.sessionId;
+        token = openTokSessionInfo.token;
+        initSession();
+      } else {
+        console.error(xhr.statusText);
+      }
+    }
+  };
+  xhr.onerror = function (e) {
+    console.error(xhr.statusText);
+  };
+  xhr.send(null);
+}
 
 function initSession() {
   session = OT.initSession(apiKey, sessionId);
