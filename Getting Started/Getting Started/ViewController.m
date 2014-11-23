@@ -166,10 +166,12 @@ NSString* _token;
                                          _publisherView.bounds.size.height)];
     [_publisherView addSubview:_publisher.view];
 
-    _archiveControlBtn.hidden = NO;
-    [_archiveControlBtn addTarget:self
-                           action:@selector(startArchive)
-                 forControlEvents:UIControlEventTouchUpInside];
+    if (kStartArchiveURL) {
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn addTarget:self
+                               action:@selector(startArchive)
+                     forControlEvents:UIControlEventTouchUpInside];
+    }
     
     _publisherAudioBtn.hidden = NO;
     [_publisherAudioBtn addTarget:self
@@ -261,7 +263,6 @@ NSString* _token;
 - (void)cleanupPublisher {
     [_publisher.view removeFromSuperview];
     _publisher = nil;
-    // this is a good place to notify the end-user that publishing has stopped.
 }
 
 /**
@@ -399,12 +400,14 @@ archiveStartedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
-    _archivingIndicatorImg.hidden = NO;
-    [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
-    _archiveControlBtn.hidden = NO;
-    [_archiveControlBtn addTarget:self
-                           action:@selector(stopArchive)
-                 forControlEvents:UIControlEventTouchUpInside];
+    if (kStopArchiveURL) {
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn addTarget:self
+                               action:@selector(stopArchive)
+                     forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 - (void)     session:(OTSession*)session
@@ -412,11 +415,13 @@ archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped with id:%@", archiveId);
     _archivingIndicatorImg.hidden = YES;
-    [_archiveControlBtn setTitle: @"View archive" forState:UIControlStateNormal];
-    _archiveControlBtn.hidden = NO;
-    [_archiveControlBtn addTarget:self
-                           action:@selector(loadArchivePlaybackInBrowser)
-                 forControlEvents:UIControlEventTouchUpInside];
+    if (kPlaybackArchiveURL) {
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn setTitle: @"View recording" forState:UIControlStateNormal];
+        [_archiveControlBtn addTarget:self
+                               action:@selector(loadArchivePlaybackInBrowser)
+                     forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 - (void)session:(OTSession*)session receivedSignalType:(NSString*)type fromConnection:(OTConnection*)connection withString:(NSString*)string {
