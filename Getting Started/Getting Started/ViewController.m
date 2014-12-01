@@ -9,7 +9,9 @@
 #import <OpenTok/OpenTok.h>
 
 @interface ViewController ()
-<OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate, UITextViewDelegate>
+<OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate, UITextViewDelegate, UIScrollViewDelegate>
+@property (weak, nonatomic) IBOutlet UIView *controlsView;
+@property (weak, nonatomic) IBOutlet UIView *videoContainerView;
 @property (weak, nonatomic) IBOutlet UIView *subscriberView;
 @property (weak, nonatomic) IBOutlet UIView *publisherView;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraBtn;
@@ -17,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *publisherAudioBtn;
 @property (weak, nonatomic) IBOutlet UIButton *subscriberAudioBtn;
 @property (weak, nonatomic) IBOutlet UIImageView *archivingIndicatorImg;
+@property (weak, nonatomic) IBOutlet UIScrollView *chatInputOutputScrollView;
 @property (weak, nonatomic) IBOutlet UIScrollView *chatScrollView;
 @property (weak, nonatomic) IBOutlet UITextView *chatTextInputView;
 
@@ -71,6 +74,10 @@ NSString* _token;
 {
     [super viewDidLoad];
     _chatTextInputView.delegate = self;
+    CGRect frame = _videoContainerView.frame;
+    frame.size.width = _videoContainerView.bounds.size.width;
+    frame.size.height = (3/4) * frame.size.width;
+    _videoContainerView.frame = frame;
     [self getSessionCredentials];
 }
 
@@ -187,18 +194,20 @@ NSString* _token;
 -(void)startArchive
 {
     _archiveControlBtn.hidden = YES;
-    NSURL *url = [NSURL URLWithString: kStartArchiveURL];
+    NSString *fullURL = kStartArchiveURL;
+    fullURL = [fullURL stringByAppendingString:_sessionId];
+    NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
-    [request setHTTPMethod: @"GET"];
+    [request setHTTPMethod: @"POST"];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         if (error){
             NSLog(@"Error starting the archive: %@. URL : %@",
                   [error localizedDescription],
-                  kStartArchiveURL);
+                  fullURL);
         }
         else{
-            NSLog(@"Web service call to start the archive: %@", kStartArchiveURL);
+            NSLog(@"Web service call to start the archive: %@", fullURL);
         }
     }];
 }
@@ -207,11 +216,10 @@ NSString* _token;
 {
     _archiveControlBtn.hidden = YES;
     NSString *fullURL = kStopArchiveURL;
-    fullURL = [fullURL stringByAppendingString:@"/"];
     fullURL = [fullURL stringByAppendingString:_archiveId];
     NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
-    [request setHTTPMethod: @"GET"];
+    [request setHTTPMethod: @"POST"];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         if (error){
@@ -329,6 +337,9 @@ NSString* _token;
     textView.frame = frame;
     
     [_chatScrollView addSubview:textView];
+    CGPoint bottomOffset = CGPointMake(0, _chatScrollView.contentSize.height);
+    [_chatScrollView setContentOffset:bottomOffset animated:YES];
+
 }
 
 # pragma mark - OTSession delegate callbacks
@@ -400,6 +411,7 @@ archiveStartedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
+    _archivingIndicatorImg.hidden = NO;
     if (kStopArchiveURL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
@@ -484,6 +496,8 @@ didFailWithError:(OTError*) error
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
     _chatTextInputView.text = @"";
+    CGPoint bottomOffset = CGPointMake(0, 160);
+    [_chatInputOutputScrollView setContentOffset:bottomOffset animated:YES];
     return YES;
 }
 
@@ -503,6 +517,8 @@ didFailWithError:(OTError*) error
     else if (location != NSNotFound){
         [textView resignFirstResponder];
         [self sendChatMessage];
+        CGPoint bottomOffset = CGPointMake(0, 0);
+        [_chatInputOutputScrollView setContentOffset:bottomOffset animated:YES];
         return NO;
     }
     return YES;
