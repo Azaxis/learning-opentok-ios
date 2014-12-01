@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,10 +17,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FTC-9e-yPc" userLabel="Videos View">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FTC-9e-yPc" userLabel="Videos View">
                                 <rect key="frame" x="-20" y="-20" width="640" height="300"/>
                                 <subviews>
-                                    <containerView opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YM2-i5-qwZ" userLabel="Subscriber Container">
+                                    <containerView opaque="NO" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YM2-i5-qwZ" userLabel="Subscriber Container">
                                         <rect key="frame" x="20" y="20" width="600" height="260"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     </containerView>
@@ -39,10 +40,12 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="YM2-i5-qwZ" secondAttribute="trailing" id="9AB-ad-lGY"/>
+                                    <constraint firstItem="YM2-i5-qwZ" firstAttribute="top" secondItem="FTC-9e-yPc" secondAttribute="top" constant="20" id="R0l-Um-RNx"/>
+                                    <constraint firstItem="YM2-i5-qwZ" firstAttribute="centerY" secondItem="FTC-9e-yPc" secondAttribute="centerY" id="itw-Gm-tzS"/>
                                     <constraint firstItem="YM2-i5-qwZ" firstAttribute="leading" secondItem="FTC-9e-yPc" secondAttribute="leading" id="zq3-dj-TGW"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QMf-qt-bLo" userLabel="Controls View">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QMf-qt-bLo" userLabel="Controls View">
                                 <rect key="frame" x="-4" y="258" width="604" height="54"/>
                                 <subviews>
                                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Yu-2s-hVu" userLabel="Archive Control Button">
@@ -90,8 +93,17 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="QMf-qt-bLo" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="8qQ-BO-xak"/>
+                            <constraint firstItem="QMf-qt-bLo" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="238" id="974-0P-F9D"/>
+                            <constraint firstItem="FTC-9e-yPc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-36" id="egc-kR-OsZ"/>
+                            <constraint firstItem="81a-R0-mRb" firstAttribute="top" secondItem="FTC-9e-yPc" secondAttribute="bottom" constant="30" id="hpc-1f-paT"/>
+                            <constraint firstAttribute="bottom" secondItem="FTC-9e-yPc" secondAttribute="bottom" constant="320" id="iN9-eN-hQj"/>
+                            <constraint firstItem="FTC-9e-yPc" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="-20" id="jqK-mw-9Pm"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="QMf-qt-bLo" secondAttribute="bottom" constant="288" id="mNk-YM-XgK"/>
                             <constraint firstItem="QMf-qt-bLo" firstAttribute="centerX" secondItem="PBi-sA-0IS" secondAttribute="centerX" constant="-3" id="q19-Kh-qby"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="81a-R0-mRb" secondAttribute="bottom" id="q5j-YW-m8m"/>
+                            <constraint firstItem="FTC-9e-yPc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="zMq-VK-3q0"/>
+                            <constraint firstItem="QMf-qt-bLo" firstAttribute="trailing" secondItem="y3c-jy-aDJ" secondAttribute="trailing" id="zZc-OF-GMU"/>
                         </constraints>
                     </view>
                     <connections>

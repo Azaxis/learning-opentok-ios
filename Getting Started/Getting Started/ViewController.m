@@ -74,10 +74,6 @@ NSString* _token;
 {
     [super viewDidLoad];
     _chatTextInputView.delegate = self;
-    CGRect frame = _videoContainerView.frame;
-    frame.size.width = _videoContainerView.bounds.size.width;
-    frame.size.height = (3/4) * frame.size.width;
-    _videoContainerView.frame = frame;
     [self getSessionCredentials];
 }
 
@@ -496,7 +492,7 @@ didFailWithError:(OTError*) error
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
     _chatTextInputView.text = @"";
-    CGPoint bottomOffset = CGPointMake(0, 160);
+    CGPoint bottomOffset = CGPointMake(0, 260);
     [_chatInputOutputScrollView setContentOffset:bottomOffset animated:YES];
     return YES;
 }
