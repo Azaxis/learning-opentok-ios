@@ -74,7 +74,7 @@
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="YRZ-mG-6v2"/>
                                         </connections>
                                     </scrollView>
-                                    <textView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" text="Enter text chat message here." translatesAutoresizingMaskIntoConstraints="NO" id="QSk-b0-GdB">
+                                    <textView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" text="Enter text chat message here." translatesAutoresizingMaskIntoConstraints="NO" id="QSk-b0-GdB" userLabel="Chat Input Text">
                                         <rect key="frame" x="0.0" y="245" width="568" height="37"/>
                                         <color key="backgroundColor" red="0.91930621603260865" green="0.91930621603260865" blue="0.91930621603260865" alpha="1" colorSpace="calibratedRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -83,14 +83,15 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="PBi-sA-0IS" firstAttribute="leading" secondItem="81a-R0-mRb" secondAttribute="leading" constant="-4" id="5p9-6n-jG9"/>
-                                    <constraint firstAttribute="bottom" secondItem="PBi-sA-0IS" secondAttribute="bottom" constant="41" id="Xvh-Ly-THG"/>
                                     <constraint firstAttribute="bottom" secondItem="QSk-b0-GdB" secondAttribute="bottom" id="q56-n9-JpD"/>
+                                    <constraint firstAttribute="bottom" secondItem="QSk-b0-GdB" secondAttribute="bottom" constant="8" id="vdr-rv-zHk"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="QMf-qt-bLo" firstAttribute="centerX" secondItem="PBi-sA-0IS" secondAttribute="centerX" constant="-3" id="q19-Kh-qby"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="81a-R0-mRb" secondAttribute="bottom" id="q5j-YW-m8m"/>
                         </constraints>
                     </view>
                     <connections>
