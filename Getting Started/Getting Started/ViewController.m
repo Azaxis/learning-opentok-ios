@@ -73,7 +73,6 @@ NSString* _token;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    _chatTextInputView.delegate = self;
     [self getSessionCredentials];
 }
 
