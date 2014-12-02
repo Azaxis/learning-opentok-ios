@@ -30,43 +30,10 @@
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
     NSString* _archiveId;
+    NSString* _apiKey;
+    NSString* _sessionId;
+    NSString* _token;
 }
-
-/*
- Set kSessionCredentialsUrl to the URL for your webservice that returns
- the OpenTok session ID, API key, and token to be used by this client.
- The webservice should return the data as JSON in the following form:
-
- {
-   "sessionId":"2_MX40NDQ0MzEyMn5-fn4",
-   "apiKey":"12345",
-   "token":"T1==cGFydG5lcl9pZD00jg="
- }
-
- Set kStartArchiveURL to the URL for your webservice that starts recording
- the session to an OpenTok archive:
-
- Set kStartArchiveURL to the URL for your webservice that stops recording
- the session to an OpenTok archive:
-
- Set kPlaybackArchiveURL to the URL for your the page that plays back archive
- recordings. Append the URL with a query string containing the archive ID:
- */
-static NSString *const kSessionCredentialsUrl = @"";
-static NSString *const kStartArchiveURL = @"";
-static NSString *const kStopArchiveURL = @"";
-static NSString *const kPlaybackArchiveURL = @"";
-
-/*
- For test purposes, if you do not have a webservice set up to provide OpenTok
- session information, you can set the following to your OpenTok API key,
- a test session ID, and a test token, which you can obtain at the OpenTok
- dashboard: https://dashboard.tokbox.com
- */
-
-NSString* _apiKey;
-NSString* _sessionId;
-NSString* _token;
 
 #pragma mark - View lifecycle
 
@@ -78,15 +45,15 @@ NSString* _token;
 
 - (void)getSessionCredentials
 {
-    if (!_apiKey || !_sessionId || !_token) {
+    if (!API_KEY || !SESSION_ID || !TOKEN) {
         // Get the OpenTok API key and a session ID and token from the web service
-        NSURL *url = [NSURL URLWithString: kSessionCredentialsUrl];
+        NSURL *url = [NSURL URLWithString: SESSION_CREDENTIALS_URL];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
         [request setHTTPMethod: @"GET"];
         
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
             if (error){
-                NSLog(@"Error,%@, URL: %@", [error localizedDescription],kSessionCredentialsUrl);
+                NSLog(@"Error,%@, URL: %@", [error localizedDescription],SESSION_CREDENTIALS_URL);
             }
             else{
                 NSDictionary *roomInfo = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -95,7 +62,7 @@ NSString* _token;
                 _sessionId = [roomInfo objectForKey:@"sessionId"];
                 
                 if(!_apiKey || !_token || !_sessionId) {
-                    NSLog(@"Error invalid response from server, URL: %@",kSessionCredentialsUrl);
+                    NSLog(@"Error invalid response from server, URL: %@",SESSION_CREDENTIALS_URL);
                 } else {
                     [self doConnect];
                 }
@@ -104,6 +71,9 @@ NSString* _token;
     } else {
         // Use the hardcoded API key, session ID, and token values,
         // which you should not do in a production application.
+        _apiKey = API_KEY;
+        _sessionId = SESSION_ID;
+        _token = TOKEN;
         [self doConnect];
     }
 }
@@ -168,7 +138,7 @@ NSString* _token;
                                          _publisherView.bounds.size.height)];
     [_publisherView addSubview:_publisher.view];
 
-    if (kStartArchiveURL) {
+    if (START_ARCHIVE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn addTarget:self
                                action:@selector(startArchive)
@@ -189,7 +159,7 @@ NSString* _token;
 -(void)startArchive
 {
     _archiveControlBtn.hidden = YES;
-    NSString *fullURL = kStartArchiveURL;
+    NSString *fullURL = START_ARCHIVE_URL;
     fullURL = [fullURL stringByAppendingString:_sessionId];
     NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
@@ -210,7 +180,7 @@ NSString* _token;
 -(void)stopArchive
 {
     _archiveControlBtn.hidden = YES;
-    NSString *fullURL = kStopArchiveURL;
+    NSString *fullURL = STOP_ARCHIVE_URL;
     fullURL = [fullURL stringByAppendingString:_archiveId];
     NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
@@ -229,7 +199,7 @@ NSString* _token;
 
 -(void)loadArchivePlaybackInBrowser
 {
-    NSString *fullURL = kPlaybackArchiveURL;
+    NSString *fullURL = PLAYBACK_ARCHIVE_URL;
     fullURL = [fullURL stringByAppendingString:@"?archiveId="];
     fullURL = [fullURL stringByAppendingString:_archiveId];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fullURL]];
@@ -407,7 +377,7 @@ archiveStartedWithId:(NSString *)archiveId
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
     _archivingIndicatorImg.hidden = NO;
-    if (kStopArchiveURL) {
+    if (STOP_ARCHIVE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
         _archiveControlBtn.hidden = NO;
@@ -422,7 +392,7 @@ archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped with id:%@", archiveId);
     _archivingIndicatorImg.hidden = YES;
-    if (kPlaybackArchiveURL) {
+    if (PLAYBACK_ARCHIVE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn setTitle: @"View recording" forState:UIControlStateNormal];
         [_archiveControlBtn addTarget:self

@@ -25,6 +25,14 @@ Before you can test the application, you need to make some settings in Xcode.
    From the OpenTok iOS SDK, you can drag the OpenTok.framework into the list of
    libraries in the Xcode project explorer for the app.
 
+4. Copy the SampleConfig.h file to a Config.h file.
+
+   Copy the contents of the SampleConfig.h file to the clipboard. Then select
+   File > New > File (Command-N). In the dialog that is displayed, select
+   Header File, click Next, and save the file as Config.h.
+
+  The next section describes how setting values for the constants defined in this file.
+
 ## Getting an OpenTok session ID, token, and API key
 
 An OpenTok session connects different clients letting them share audio-video streams and
@@ -56,9 +64,9 @@ information about tokens, see the OpenTok [Token creation overview] [4].
 
 Upon starting up, the application calls the `[self getSessionCredentials:]` method (defined in the
 ViewController.m file). This method calls a web service that provides an OpenTok session ID, API key, and token to be used by the client. Set URL of the web service in the `kSessionCredentialsUrl`
-property (also in the ViewController.m file):
+constants in the Config.h file (see the previous section)
 
-    static NSString *const kSessionCredentialsUrl = @"https://your_web_service_url";
+    define SESSION_CREDENTIALS_URL @"http://YOUR-SERVER-URL/session"
 
 The web service returns an HTTP response that includes the session ID, the token, and API key
 formatted as JSON data:
@@ -72,12 +80,12 @@ formatted as JSON data:
 For sample PHP server code that serves up these credentials, see the Getting Started PHP sample
 application. (TODO: Add a link.)
 
-For test purposes, you can assign hard-coded test session IDs to the following variable declarations
-at the beginning of the ViewController.m file:
+For test purposes, you can assign hard-coded test session IDs to the following constant declarations
+in the Config.h file:
 
-    NSString* _sessionId = @"2_MX40NDQ0MzEyMn5-fn4";
-    NSString* _apiKey = "12345",
-    NSString* _token @"T1==cGFydG5lcl9pZD00jg=";
+    #define API_KEY @"2_MX40NDQ0MzEyMn5-fn4"
+    #define SESSION_ID "12345"
+    #define TOKEN @"T1==cGFydG5lcl9pZD00jg="
 
 You can obtain your API key as well as test values for the session ID and token at the
 [OpenTok dashboard] [4]. If you set these hard-coded values, the application uses these values
@@ -97,9 +105,9 @@ The OpenTok archiving API lets you record audio-video streams in a session to MP
 server-side code to start and stop archive recordings. Set the following properties to the URLs of
 web service calls that start archive recording, stop recording, and play back the recorded video:
 
-    static NSString *const kStartArchiveURL = @"";
-    static NSString *const kStopArchiveURL = @"";
-    static NSString *const kPlaybackArchiveURL = @"";
+    #define START_ARCHIVE_URL @"http://YOUR-SERVER-URL/start/"
+    #define STOP_ARCHIVE_URL @"http://YOUR-SERVER-URL/stop/"
+    #define PLAYBACK_ARCHIVE_URL @"http://YOUR-SERVER-URL/"
 
 If you do not set these strings, the *Start recording*, *Stop Recording*, and *View archive*
 buttons will not be available in the app.
@@ -432,7 +440,7 @@ opens a web page (in Safari) that displays the archive recording.
 Using the signaling API to implement text chat
 ----------------------------------------------
 
-When the user enters text in the text chat input text field, the '[self sendChatMessage:]
+When the user enters text in the text chat input text field, the '[self sendChatMessage:]``
 method is called:
 
     - (void) sendChatMessage
