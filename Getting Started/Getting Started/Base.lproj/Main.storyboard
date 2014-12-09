@@ -93,6 +93,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="archiving_on-10.png" width="10" height="10"/>
         <image name="camera-switch_black-33.png" width="33" height="33"/>
         <image name="mic_muted-24.png" width="24" height="24"/>
     </resources>
