@@ -385,6 +385,122 @@ Setting the `cameraPosition` property of the OTPublisher object sets the camera 
 the publisher. The `AVCaptureDevicePositionFront` and `AVCaptureDevicePositionBack`
 constants are defined in the [AVCaptureDevice] [6] class.
 
+Recording the session to an archive
+-----------------------------------
+
+*Important* -- To view the code for this functionality, switch to the *archiving* branch
+of this git repository.
+
+When the user clicks the Start Recording and Stop Recording buttons, the app calls the
+[self startArchive:] and [self startArchive:] methods. These call web services that call
+server-side code start and stop archive recordings.
+(See [Setting the archiving web service URLs](#setting-the-archiving-web-service-urls).)
+
+When archive recording starts, the implementation of the
+`[OTSessionDelegate session:archiveStartedWithId:name:]` method is called:
+
+    - (void)     session:(OTSession*)session
+    archiveStartedWithId:(NSString *)archiveId
+                    name:(NSString *)name
+    {
+        NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
+        _archiveId = archiveId;
+        _archivingIndicatorImg.hidden = NO;
+        [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn addTarget:self
+                               action:@selector(stopArchive)
+                     forControlEvents:UIControlEventTouchUpInside];
+    }
+
+This causes the `_archivingIndicatorImg` image (defined in the main storyboard) to be displayed.
+The method stores the archive ID (identifying the archive) to an `archiveId` property.
+The method also changes the archiving control button text to change to "Stop recording".
+
+When the user clicks the Stop Recording button, the app passes the archive ID along to the
+web service that stops the archive recording.
+
+When archive recording stops, the implementation of the
+`[OTSessionDelegate session:archiveStartedWithId:name:]` method is called:
+
+    - (void)     session:(OTSession*)session
+    archiveStoppedWithId:(NSString *)archiveId
+    {
+        NSLog(@"session archiving stopped with id:%@", archiveId);
+        _archivingIndicatorImg.hidden = YES;
+        [_archiveControlBtn setTitle: @"View archive" forState:UIControlStateNormal];
+        _archiveControlBtn.hidden = NO;
+        [_archiveControlBtn addTarget:self
+                               action:@selector(loadArchivePlaybackInBrowser)
+                     forControlEvents:UIControlEventTouchUpInside];
+    }
+
+This causes the `_archivingIndicatorImg` image (defined in the main storyboard) to be
+displayed. It also changes the archiving control button text to change to "View archive".
+When the user clicks this button, the `[self loadArchivePlaybackInBrowser:]` method
+opens a web page (in Safari) that displays the archive recording.
+
+Using the signaling API to implement text chat
+----------------------------------------------
+
+*Important* -- To view the code for this functionality, switch to the *signaling* branch
+of this git repository.
+
+When the user enters text in the text chat input text field, the '[self sendChatMessage:]``
+method is called:
+
+    - (void) sendChatMessage
+    {
+        OTError* error = nil;
+        [_session signalWithType:@"chat"
+                          string:_chatTextInputView.text
+                      connection:nil error:&error];
+        if (error) {
+            NSLog(@"Signal error: %@", error);
+        } else {
+            NSLog(@"Signal sent: %@", _chatTextInputView.text);
+        }
+        _chatTextInputView.text = @"";
+    }
+
+This method calls the `[OTSession signalWithType:string:connection:]` method. This
+method sends a message to clients connected to the OpenTok session. Each signal is
+defined by a `type` string identifying the type of message (in this case '"chat")
+and a string containing the message.
+
+When another client connected to the session (in this app, there is only one) sends
+a message, the implementation of the `[OTSessionDelegate session:receivedSignalType:string:]`
+method is called:
+
+    - (void)session:(OTSession*)session receivedSignalType:(NSString*)type fromConnection:(OTConnection*)connection withString:(NSString*)string {
+        NSLog(@"Received signal %@", string);
+        Boolean fromSelf = NO;
+        if ([connection.connectionId isEqualToString:session.connection.connectionId]) {
+            fromSelf = YES;
+        }
+        [self logSignalString:string fromSelf:fromSelf];
+    }
+
+This method checks to see if the signal was sent by the local iOS client or by the other
+client connected to the session:
+
+    Boolean fromSelf = NO;
+    if ([connection.connectionId isEqualToString:session.connection.connectionId]) {
+        fromSelf = YES;
+    }
+
+The `session` argument represents your clients OTSession object. The OTSession object has
+a `connection` property with a `connectionId` property. The `connection` argument represents
+the connection of client sending the message. If these match, the signal was sent by the
+local iOS app.
+
+The method calls the `[self logSignalString:]` method which displays the message string in
+the text chat scroll view.
+
+This app uses the OpenTok signaling API to implement text chat. However, you can use the
+signaling API to send messages to other clients (individually or collectively) connected to
+the session.
+
 Other resources
 ---------------
 
