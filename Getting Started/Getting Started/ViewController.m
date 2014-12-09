@@ -15,13 +15,8 @@
 @property (weak, nonatomic) IBOutlet UIView *subscriberView;
 @property (weak, nonatomic) IBOutlet UIView *publisherView;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraBtn;
-@property (weak, nonatomic) IBOutlet UIButton *archiveControlBtn;
 @property (weak, nonatomic) IBOutlet UIButton *publisherAudioBtn;
 @property (weak, nonatomic) IBOutlet UIButton *subscriberAudioBtn;
-@property (weak, nonatomic) IBOutlet UIImageView *archivingIndicatorImg;
-@property (weak, nonatomic) IBOutlet UIScrollView *chatInputOutputScrollView;
-@property (weak, nonatomic) IBOutlet UIScrollView *chatScrollView;
-@property (weak, nonatomic) IBOutlet UITextView *chatTextInputView;
 
 @end
 
@@ -138,12 +133,6 @@
                                          _publisherView.bounds.size.height)];
     [_publisherView addSubview:_publisher.view];
 
-    if (START_ARCHIVE_URL) {
-        _archiveControlBtn.hidden = NO;
-        [_archiveControlBtn addTarget:self
-                               action:@selector(startArchive)
-                     forControlEvents:UIControlEventTouchUpInside];
-    }
     
     _publisherAudioBtn.hidden = NO;
     [_publisherAudioBtn addTarget:self
@@ -156,54 +145,6 @@
      forControlEvents:UIControlEventTouchUpInside];
 }
 
--(void)startArchive
-{
-    _archiveControlBtn.hidden = YES;
-    NSString *fullURL = START_ARCHIVE_URL;
-    fullURL = [fullURL stringByAppendingString:_sessionId];
-    NSURL *url = [NSURL URLWithString: fullURL];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
-    [request setHTTPMethod: @"POST"];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (error){
-            NSLog(@"Error starting the archive: %@. URL : %@",
-                  [error localizedDescription],
-                  fullURL);
-        }
-        else{
-            NSLog(@"Web service call to start the archive: %@", fullURL);
-        }
-    }];
-}
-
--(void)stopArchive
-{
-    _archiveControlBtn.hidden = YES;
-    NSString *fullURL = STOP_ARCHIVE_URL;
-    fullURL = [fullURL stringByAppendingString:_archiveId];
-    NSURL *url = [NSURL URLWithString: fullURL];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
-    [request setHTTPMethod: @"POST"];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (error){
-            NSLog(@"Error stopping the archive: %@. URL : %@",
-                  [error localizedDescription],fullURL);
-        }
-        else{
-            NSLog(@"Web service call to stop the archive: %@", fullURL);
-        }
-    }];
-}
-
--(void)loadArchivePlaybackInBrowser
-{
-    NSString *fullURL = PLAYBACK_ARCHIVE_URL;
-    fullURL = [fullURL stringByAppendingString:@"?archiveId="];
-    fullURL = [fullURL stringByAppendingString:_archiveId];
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fullURL]];
-}
 
 -(void)togglePublisherMic
 {
@@ -266,47 +207,6 @@
     _subscriber = nil;
 }
 
-- (void) sendChatMessage
-{
-    OTError* error = nil;
-    [_session signalWithType:@"chat" string:_chatTextInputView.text connection:nil error:&error];
-    if (error) {
-        NSLog(@"Signal error: %@", error);
-    } else {
-        NSLog(@"Signal sent: %@", _chatTextInputView.text);
-    }
-    _chatTextInputView.text = @"";
-}
-
-- (void)logSignalString:(NSString*)string fromSelf:(Boolean)fromSelf {
-    UIColor* backgroundColor = [UIColor whiteColor];
-    if (fromSelf) {
-        backgroundColor = [UIColor colorWithRed:0.81 green:0.89 blue:0.95 alpha:1.0];
-    }
-    UITextView* textView =
-    [[UITextView alloc]initWithFrame:CGRectMake(0,
-                                                (_chatScrollView.subviews.count - 2) * 40,
-                                                _chatScrollView.bounds.size.width - 20,
-                                                40)];
-    textView.font = [UIFont fontWithName:@"Helvetica" size:12];
-    textView.font = [UIFont boldSystemFontOfSize:12];
-    textView.backgroundColor = backgroundColor;
-    textView.textColor = [UIColor blackColor];
-    textView.scrollEnabled = NO;
-    textView.pagingEnabled = YES;
-    textView.editable = NO;
-    textView.text = string;
-    
-    CGRect frame = textView.frame;
-    frame.size.height = [textView contentSize].height;
-    textView.frame = frame;
-    
-    [_chatScrollView addSubview:textView];
-    CGPoint bottomOffset = CGPointMake(0, _chatScrollView.contentSize.height);
-    [_chatScrollView setContentOffset:bottomOffset animated:YES];
-
-}
-
 # pragma mark - OTSession delegate callbacks
 
 - (void)sessionDidConnect:(OTSession*)session
@@ -343,7 +243,6 @@ streamDestroyed:(OTStream *)stream
     if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
     {
         [self cleanupSubscriber];
-        _chatTextInputView.hidden = YES;
     }
 }
 
@@ -368,46 +267,6 @@ connectionDestroyed:(OTConnection *)connection
 didFailWithError:(OTError*)error
 {
     NSLog(@"didFailWithError: (%@)", error);
-}
-
-- (void)     session:(OTSession*)session
-archiveStartedWithId:(NSString *)archiveId
-                name:(NSString *)name
-{
-    NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
-    _archiveId = archiveId;
-    _archivingIndicatorImg.hidden = NO;
-    if (STOP_ARCHIVE_URL) {
-        _archiveControlBtn.hidden = NO;
-        [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
-        _archiveControlBtn.hidden = NO;
-        [_archiveControlBtn addTarget:self
-                               action:@selector(stopArchive)
-                     forControlEvents:UIControlEventTouchUpInside];
-    }
-}
-
-- (void)     session:(OTSession*)session
-archiveStoppedWithId:(NSString *)archiveId
-{
-    NSLog(@"session archiving stopped with id:%@", archiveId);
-    _archivingIndicatorImg.hidden = YES;
-    if (PLAYBACK_ARCHIVE_URL) {
-        _archiveControlBtn.hidden = NO;
-        [_archiveControlBtn setTitle: @"View recording" forState:UIControlStateNormal];
-        [_archiveControlBtn addTarget:self
-                               action:@selector(loadArchivePlaybackInBrowser)
-                     forControlEvents:UIControlEventTouchUpInside];
-    }
-}
-
-- (void)session:(OTSession*)session receivedSignalType:(NSString*)type fromConnection:(OTConnection*)connection withString:(NSString*)string {
-    NSLog(@"Received signal %@", string);
-    Boolean fromSelf = NO;
-    if ([connection.connectionId isEqualToString:session.connection.connectionId]) {
-        fromSelf = YES;
-    }
-    [self logSignalString:string fromSelf:fromSelf];
 }
 
 # pragma mark - OTPublisher delegate callbacks
@@ -446,7 +305,6 @@ didFailWithError:(OTError*) error
                            action:@selector(toggleSubscriberAudio)
                  forControlEvents:UIControlEventTouchUpInside];
 
-    _chatTextInputView.hidden = NO;
 }
 
 - (void)subscriber:(OTSubscriberKit*)subscriber
@@ -455,45 +313,6 @@ didFailWithError:(OTError*) error
     NSLog(@"subscriber %@ didFailWithError %@",
           subscriber.stream.streamId,
           error);
-}
-
-# pragma mark - UITextViewDelegate callbacks
-
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
-    _chatTextInputView.text = @"";
-    CGPoint bottomOffset = CGPointMake(0, 260);
-    [_chatInputOutputScrollView setContentOffset:bottomOffset animated:YES];
-    return YES;
-}
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
-{
-    NSCharacterSet *doneButtonCharacterSet = [NSCharacterSet newlineCharacterSet];
-    NSRange replacementTextRange = [text rangeOfCharacterFromSet:doneButtonCharacterSet];
-    NSUInteger location = replacementTextRange.location;
-    
-    if (textView.text.length + text.length > 140){
-        if (location != NSNotFound){
-            [textView resignFirstResponder];
-            [self sendChatMessage];
-        }
-        return NO;
-    }
-    else if (location != NSNotFound){
-        [textView resignFirstResponder];
-        [self sendChatMessage];
-        CGPoint bottomOffset = CGPointMake(0, 0);
-        [_chatInputOutputScrollView setContentOffset:bottomOffset animated:YES];
-        return NO;
-    }
-    return YES;
-}
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    NSLog(@"touchesBegan:withEvent:");
-    [self.view endEditing:YES];
-    [super touchesBegan:touches withEvent:event];
 }
 
 @end
