@@ -23,7 +23,6 @@
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VNU-0U-P9j" userLabel="Publisher Container">
                                 <rect key="frame" x="16" y="502" width="120" height="90"/>
-                                <color key="backgroundColor" red="0.5" green="0.070663305063208504" blue="0.15272172737358253" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="90" id="1Rn-K7-f2t"/>
                                     <constraint firstAttribute="width" secondItem="VNU-0U-P9j" secondAttribute="height" multiplier="4:3" id="Z6m-YP-bNq"/>
