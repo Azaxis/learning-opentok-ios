@@ -10,6 +10,16 @@ chat session. Additionally, the app uses the OpenTok iOS SDK to implement the fo
 * Text chat for the participants
 * The ability to record the chat session, stop the recording, and view the recording
 
+The code for this sample is found the following git branches:
+
+* *basics* -- This branch shows you how to connect to the OpenTok session, publish a
+  stream, subscribe to a stream, mute audio, and switch the publisher's camera.
+
+* *archiving* -- This branch shows you how to record the session.
+
+* *signaling* -- This branch shows you how to use the OpenTok signaling API to implement
+  text chat.
+
 Configuring the application
 ---------------------------
 
@@ -161,21 +171,25 @@ previous section), you can test the application:
 
    This toggles the camera used (between front and back) for the published stream.
 
-8. Click in the text chat input field (labeled "Enter text chat message here"), enter a text
+In the archiving branch of this git repository, the following functionality is enabled:
+
+1. Tap the *Start recording* button.
+
+   This starts recording the audio video streams on the OpenTok Media Server.
+
+2. Click the *Stop recording* button to stop the recording.
+
+3. Click the *View recording* button to view the recording in the web browser.
+
+In the signaling branch of this git repository, the following functionality is enabled:
+
+* Click in the text chat input field (labeled "Enter text chat message here"), enter a text
    chat message and tap the Return button.
 
    The text chat message is sent to the web client. You can also send a chat message from the web
    client to the iOS client.
 
-9. Tap the *Start recording* button.
-
-   This starts recording the audio video streams on the OpenTok Media Server.
-
-10. Click the *Stop recording* button to stop the recording.
-
-11. Click the *View recording* button to view the recording in the web browser.
-
-Read the following section to learn how to use the OpenTok iOS SDK to accomplish these tasks.
+Read the following sections to learn how to use the OpenTok iOS SDK to accomplish these tasks.
 
 Connecting to the session
 -------------------------
