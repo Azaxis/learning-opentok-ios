@@ -19,30 +19,37 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TmQ-56-0Ai" userLabel="Video view">
-                                <rect key="frame" x="16" y="0.0" width="568" height="426"/>
+                                <rect key="frame" x="16" y="0.0" width="568" height="418"/>
                                 <subviews>
                                     <containerView opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="infinite" placeholderIntrinsicHeight="infinite" translatesAutoresizingMaskIntoConstraints="NO" id="YM2-i5-qwZ" userLabel="Subscriber Container">
-                                        <rect key="frame" x="0.0" y="0.0" width="568" height="426"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="568" height="418"/>
                                     </containerView>
                                     <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VNU-0U-P9j" userLabel="Publisher Container">
-                                        <rect key="frame" x="10" y="328" width="117" height="88"/>
+                                        <rect key="frame" x="10" y="328" width="120" height="80"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VNU-0U-P9j" secondAttribute="height" multiplier="4:3" id="2ot-q5-Qn9"/>
+                                            <constraint firstAttribute="width" constant="120" id="Qrf-hg-dYz"/>
+                                            <constraint firstAttribute="height" constant="80" id="u8C-Qg-guw"/>
                                         </constraints>
+                                        <variation key="default">
+                                            <mask key="constraints">
+                                                <exclude reference="2ot-q5-Qn9"/>
+                                            </mask>
+                                        </variation>
                                     </containerView>
                                     <button hidden="YES" opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S4Y-or-Dng" userLabel="Swap Camera Button">
-                                        <rect key="frame" x="94" y="383" width="33" height="33"/>
+                                        <rect key="frame" x="94" y="375" width="33" height="33"/>
                                         <state key="normal" backgroundImage="camera-switch_black-33.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                     </button>
                                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sAV-RL-4d9" userLabel="Publisher Audio Button">
-                                        <rect key="frame" x="10" y="390" width="24" height="24"/>
+                                        <rect key="frame" x="10" y="382" width="24" height="24"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <state key="normal" backgroundImage="mic_muted-24.png"/>
                                     </button>
                                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hpr-UX-Ad0" userLabel="Subscriber Audio Button">
-                                        <rect key="frame" x="534" y="391" width="24" height="25"/>
+                                        <rect key="frame" x="534" y="383" width="24" height="25"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="25" id="vLu-AH-iyL"/>
                                             <constraint firstAttribute="width" constant="24" id="yvS-es-HcH"/>
@@ -63,15 +70,43 @@
                                     <constraint firstItem="YM2-i5-qwZ" firstAttribute="leading" secondItem="TmQ-56-0Ai" secondAttribute="leading" id="dzw-Ar-fBu"/>
                                     <constraint firstAttribute="trailing" secondItem="hpr-UX-Ad0" secondAttribute="trailing" constant="10" id="eEu-Fj-Mtd"/>
                                     <constraint firstAttribute="width" secondItem="TmQ-56-0Ai" secondAttribute="height" multiplier="4:3" id="g2P-o7-VSz"/>
-                                    <constraint firstItem="VNU-0U-P9j" firstAttribute="top" secondItem="TmQ-56-0Ai" secondAttribute="top" constant="328" id="hph-1R-PNX"/>
                                     <constraint firstAttribute="bottom" secondItem="sAV-RL-4d9" secondAttribute="bottom" constant="12" id="oXJ-JZ-lRn"/>
                                     <constraint firstAttribute="bottom" secondItem="S4Y-or-Dng" secondAttribute="bottom" constant="10" id="oga-0r-Ue3"/>
                                     <constraint firstAttribute="trailing" secondItem="YM2-i5-qwZ" secondAttribute="trailing" id="qLQ-Is-fXB"/>
+                                    <constraint firstAttribute="width" secondItem="TmQ-56-0Ai" secondAttribute="height" multiplier="284:209" id="z3l-ma-SBV"/>
                                 </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="g2P-o7-VSz"/>
+                                    </mask>
+                                </variation>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nar-sv-Gbq" userLabel="Chat view">
-                                <rect key="frame" x="0.0" y="426" width="600" height="174"/>
+                                <rect key="frame" x="0.0" y="418" width="600" height="182"/>
+                                <subviews>
+                                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n7F-qt-DES">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="182"/>
+                                    </scrollView>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Tap here to send a text message." translatesAutoresizingMaskIntoConstraints="NO" id="wsx-R4-xvP">
+                                        <rect key="frame" x="0.0" y="142" width="600" height="40"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="9bF-uW-9Es"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="n7F-qt-DES" secondAttribute="trailing" id="2Z0-ky-nyN"/>
+                                    <constraint firstItem="wsx-R4-xvP" firstAttribute="bottom" secondItem="n7F-qt-DES" secondAttribute="bottom" id="BYl-RO-oRk"/>
+                                    <constraint firstItem="wsx-R4-xvP" firstAttribute="trailing" secondItem="n7F-qt-DES" secondAttribute="trailing" id="TC6-56-MbI"/>
+                                    <constraint firstItem="n7F-qt-DES" firstAttribute="leading" secondItem="nar-sv-Gbq" secondAttribute="leading" id="UIC-3i-bdo"/>
+                                    <constraint firstItem="n7F-qt-DES" firstAttribute="top" secondItem="nar-sv-Gbq" secondAttribute="top" id="Z1J-rV-c37"/>
+                                    <constraint firstAttribute="bottom" secondItem="n7F-qt-DES" secondAttribute="bottom" id="bRO-oh-Da4"/>
+                                    <constraint firstItem="wsx-R4-xvP" firstAttribute="leading" secondItem="n7F-qt-DES" secondAttribute="leading" id="ngr-Hf-sJL"/>
+                                </constraints>
                             </view>
                         </subviews>
                         <constraints>
