@@ -159,11 +159,6 @@
 -(void)togglePublisherMic
 {
     _publisher.publishAudio = !_publisher.publishAudio;
-    if (_publisher.publishAudio) {
-        [_publisherAudioBtn setTitle: @"Mute mic" forState:UIControlStateNormal];
-    } else {
-        [_publisherAudioBtn setTitle: @"Unute mic" forState:UIControlStateNormal];
-    }
 }
 
 -(void)toggleSubscriberAudio
