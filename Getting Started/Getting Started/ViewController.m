@@ -357,17 +357,13 @@ didFailWithError:(OTError*) error
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
     _chatInputTextField.text = @"";
-    // CGPoint bottomOffset = CGPointMake(0, 260);
-    // [_chatScrollView setContentOffset:bottomOffset animated:YES];
     return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self sendChatMessage];
-    // CGPoint bottomOffset = CGPointMake(0, 0);
-    // [_chatScrollView setContentOffset:bottomOffset animated:YES];
+    [self.view endEditing:YES];
     return YES;
 }
-
 
 @end
