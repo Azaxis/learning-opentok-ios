@@ -10,30 +10,13 @@
 #define Getting_Started_Config_h
 
 /*
- Set SESSION_CREDENTIALS_URL to the URL for your web service that returns
- the OpenTok session ID, API key, and token to be used by this client.
- The web service should return the data as JSON in the following form:
- 
- {
- "sessionId":"2_MX40NDQ0MzEyMn5-fn4",
- "apiKey":"12345",
- "token":"T1==cGFydG5lcl9pZD00jg="
- }
- 
- Set START_ARCHIVE_URL to the URL for your webservice that starts recording
- the session to an OpenTok archive:
- 
- Set STOP_ARCHIVE_URL to the URL for your webservice that stops recording
- the session to an OpenTok archive:
- 
- Set PLAYBACK_ARCHIVE_URL to the URL for your the page that plays back archive
- recordings. Append the URL with a query string containing the archive ID:
+ Set SAMPLE_SERVER_BASE_URL to the base URL of the web server that implements
+ the OpenTok PHP Getting Started Sample code (see the main README file.) This
+ web service handles some OpenTok-related API calls, related to obtaining
+ session IDs and tokens, and for working with archives.
  */
 
-#define SESSION_CREDENTIALS_URL @"http://YOUR-SERVER-URL/session"
-#define START_ARCHIVE_URL @"http://YOUR-SERVER-URL/start/"
-#define STOP_ARCHIVE_URL @"http://YOUR-SERVER-URL/stop/"
-#define PLAYBACK_ARCHIVE_URL @"http://YOUR-SERVER-URL/"
+#define SAMPLE_SERVER_BASE_URL @"http://YOUR-SERVER-URL"
 
 /*
  For test purposes, if you do not have a webservice set up to provide OpenTok

@@ -20,10 +20,14 @@ The code for this sample is found the following git branches:
 * *signaling* -- This branch shows you how to use the OpenTok signaling API to implement
   text chat.
 
+You will also need to clone the OpenTok PHP Getting Started repo and run its code on a
+PHP-enabled web server. See the next section for more information.
+
 Configuring the application
 ---------------------------
 
-Before you can test the application, you need to make some settings in Xcode.
+Before you can test the application, you need to make some settings in Xcode and set up
+a web service to handle some OpenTok-related API calls.
 
 ## Adding the OpenTok framework
 
@@ -43,62 +47,33 @@ Before you can test the application, you need to make some settings in Xcode.
 
   The next section describes how setting values for the constants defined in this file.
 
-## Getting an OpenTok session ID, token, and API key
+## Setting up the test web service
 
-An OpenTok session connects different clients letting them share audio-video streams and
-send messages. Clients in the same session can include iOS, Android, and web browsers.
+The OpenTok PHP Getting Started repo includes code for setting up a web service that
+handles the following API calls:
 
-**Session IDs** -- Each client that connects to the session needs the session ID, which identifies
-the session. Think of a session as a room, in which clients meet. Depending on the requirements of your application, you will either reuse the same session (and session ID) repeatedly or generate
-new session IDs for new groups of clients.
+* "/service" -- The iOS client calls this endpoint to get an OpenTok session ID, token, and API key.
+* "/start" -- The iOS client calls this endpoint to start recording the OpenTok session to
+  an archive.
+* "/stop" -- The iOS client calls this endpoint to stop recording the archive.
+* "/view" -- The iOS client load this endpoint in a web browser to display the archive recording.
 
-*Important:* This demo application assumes that only two clients -- the local iOS client and another
-client -- will connect in the same OpenTok session. For test purposes, you can reuse the same
-session ID each time two clients connect. However, in a production application, your server-side
-code must create a unique session ID for each pair of clients. In other applications, you may want
-to connect many clients in one OpenTok session (for instance, a meeting room) and connect others
-in another session (another meeting room). For examples of apps that connect users in different
-ways, see the OpenTok ScheduleKit, Presence Kit, and Link Kit [Starter Kit apps] [2].
+1. Download the repo and run its code on a PHP-enabled web server. (TODO: Add a link.)
 
-Since this app uses the OpenTok archiving feature to record the session, the session must be set
-to use the `routed` media mode, indicating that it will use the OpenTok Media Router. The OpenTok
-Media Router provides other advanced features (see [The OpenTok Media Router and media modes] [3]).
-If your application does not require the features provided by the OpenTok Media Router, you can set
-the media mode to `relayed`.
+2. In XCode, open the Config.h file (see the previous section). Add the base URL, (such as
+`@"http://example.com"`) in this line:
 
-**Token** -- The client also needs a token, which grants them access to the session. Each client is
-issued a unique token when they connect to the session. Since the user publishes an audio-video stream to the session, the token generated must include the publish role (the default). For more
-information about tokens, see the OpenTok [Token creation overview] [4].
-
-**API key** -- The API key identifies your OpenTok developer account.
-
-Upon starting up, the application calls the `[self getSessionCredentials:]` method (defined in the
-ViewController.m file). This method calls a web service that provides an OpenTok session ID, API key, and token to be used by the client. Set URL of the web service in the `kSessionCredentialsUrl`
-constants in the Config.h file (see the previous section)
-
-    define SESSION_CREDENTIALS_URL @"http://YOUR-SERVER-URL/session"
-
-The web service returns an HTTP response that includes the session ID, the token, and API key
-formatted as JSON data:
-
-    {
-      "sessionId": "2_MX40NDQ0MzEyMn5-fn4",
-      "apiKey": "12345",
-      "token": "T1==cGFydG5lcl9pZD00jg="
-    }
-
-For sample PHP server code that serves up these credentials, see the Getting Started PHP sample
-application. (TODO: Add a link.)
+      define SAMPLE_SERVER_BASE_URL @"http://YOUR-SERVER-URL/"
 
 For test purposes, you can assign hard-coded test session IDs to the following constant declarations
 in the Config.h file:
 
     #define API_KEY @"2_MX40NDQ0MzEyMn5-fn4"
-    #define SESSION_ID "12345"
+    #define SESSION_ID @"12345"
     #define TOKEN @"T1==cGFydG5lcl9pZD00jg="
 
 You can obtain your API key as well as test values for the session ID and token at the
-[OpenTok dashboard] [5]. If you set these hard-coded values, the application uses these values
+[OpenTok dashboard] [2]. If you set these hard-coded values, the application uses these values
 instead of retrieving them from the web service. However in a production application, you will
 always want to use a web service to obtain a unique token each time a user connects to an OpenTok
 session.
@@ -109,27 +84,12 @@ use tokens, causing streaming minutes to be charged to your OpenTok developer ac
 it is a best practice to use an HTTPS URL for the web service that returns an OpenTok token,
 so that it cannot be intercepted and misused.
 
-## Setting the archiving web service URLs
-
-The OpenTok archiving API lets you record audio-video streams in a session to MP4 files. You use
-server-side code to start and stop archive recordings. Set the following properties to the URLs of
-web service calls that start archive recording, stop recording, and play back the recorded video:
-
-    #define START_ARCHIVE_URL @"http://YOUR-SERVER-URL/start/"
-    #define STOP_ARCHIVE_URL @"http://YOUR-SERVER-URL/stop/"
-    #define PLAYBACK_ARCHIVE_URL @"http://YOUR-SERVER-URL/"
-
-If you do not set these strings, the *Start recording*, *Stop Recording*, and *View archive*
-buttons will not be available in the app.
-
-See the PHP Getting Started sample for sample server-side PHP code for OpenTok archiving.
-(TODO: Add a link.)
-
 Testing the app
 ---------------
 
-Now that you have configured the app to get the OpenTok session ID, token, and API key (see the
-previous section), you can test the application:
+Make sure that you have downloaded the OpenTok PHP Getting Started repo and run it on a PHP-enabled
+web server. This sample code handles OpenTok-related web service requests. (See the previous
+section.)
 
 1. In XCode, launch the app in a connected iOS device or in the iOS simulator.
 
@@ -190,6 +150,52 @@ In the signaling branch of this git repository, the following functionality is e
    client to the iOS client.
 
 Read the following sections to learn how to use the OpenTok iOS SDK to accomplish these tasks.
+
+Getting an OpenTok session ID, token, and API key
+-------------------------------------------------
+
+An OpenTok session connects different clients letting them share audio-video streams and
+send messages. Clients in the same session can include iOS, Android, and web browsers.
+
+**Session ID** -- Each client that connects to the session needs the session ID, which identifies
+the session. Think of a session as a room, in which clients meet. Depending on the requirements of your application, you will either reuse the same session (and session ID) repeatedly or generate
+new session IDs for new groups of clients.
+
+*Important:* This demo application assumes that only two clients -- the local iOS client and another
+client -- will connect in the same OpenTok session. For test purposes, you can reuse the same
+session ID each time two clients connect. However, in a production application, your server-side
+code must create a unique session ID for each pair of clients. In other applications, you may want
+to connect many clients in one OpenTok session (for instance, a meeting room) and connect others
+in another session (another meeting room). For examples of apps that connect users in different
+ways, see the OpenTok ScheduleKit, Presence Kit, and Link Kit [Starter Kit apps] [3].
+
+Since this app uses the OpenTok archiving feature to record the session, the session must be set
+to use the `routed` media mode, indicating that it will use the OpenTok Media Router. The OpenTok
+Media Router provides other advanced features (see [The OpenTok Media Router and media modes] [4]).
+If your application does not require the features provided by the OpenTok Media Router, you can set
+the media mode to `relayed`.
+
+**Token** -- The client also needs a token, which grants them access to the session. Each client is
+issued a unique token when they connect to the session. Since the user publishes an audio-video stream to the session, the token generated must include the publish role (the default). For more
+information about tokens, see the OpenTok [Token creation overview] [5].
+
+**API key** -- The API key identifies your OpenTok developer account.
+
+Upon starting up, the application calls the `[self getSessionCredentials:]` method (defined in the
+ViewController.m file). This method calls a web service that provides an OpenTok session ID, API key, and token to be used by the client. In the Config.h file (see the previous section), set the
+`SAMPLE_SERVER_BASE_URL` constant to the base URL of the web service that handles OpenTok-related
+API calls:
+
+    define SAMPLE_SERVER_BASE_URL @"http://YOUR-SERVER-URL/"
+
+The "/session" endpoint of the web service returns an HTTP response that includes the session ID,
+the token, and API key formatted as JSON data:
+
+    {
+      "sessionId": "2_MX40NDQ0MzEyMn5-fn4",
+      "apiKey": "12345",
+      "token": "T1==cGFydG5lcl9pZD00jg="
+    }
 
 Connecting to the session
 -------------------------
@@ -405,10 +411,20 @@ Recording the session to an archive
 *Important* -- To view the code for this functionality, switch to the *archiving* branch
 of this git repository.
 
+The OpenTok archiving API lets you record audio-video streams in a session to MP4 files. You use
+server-side code to start and stop archive recordings. In the Config.h file, you set the following
+constant to the base URL of the web service the app calls to start archive recording, stop
+recording, and play back the recorded video:
+
+    #define SAMPLE_SERVER_BASE_URL
+
+If you do not set this string, the Start Recording, Stop Recording, and View Archive
+buttons will not be available in the app.
+
 When the user clicks the Start Recording and Stop Recording buttons, the app calls the
-[self startArchive:] and [self startArchive:] methods. These call web services that call
+`[self startArchive:]` and `[self startArchive:]` methods. These call web services that call
 server-side code start and stop archive recordings.
-(See [Setting the archiving web service URLs](#setting-the-archiving-web-service-urls).)
+(See [Setting up the test web service](#setting-up-the-test-web-service).)
 
 When archive recording starts, the implementation of the
 `[OTSessionDelegate session:archiveStartedWithId:name:]` method is called:
@@ -467,19 +483,19 @@ method is called:
     {
         OTError* error = nil;
         [_session signalWithType:@"chat"
-                          string:_chatTextInputView.text
+                          string:_chatInputTextField.text
                       connection:nil error:&error];
         if (error) {
             NSLog(@"Signal error: %@", error);
         } else {
-            NSLog(@"Signal sent: %@", _chatTextInputView.text);
+            NSLog(@"Signal sent: %@", _chatInputTextField.text);
         }
         _chatTextInputView.text = @"";
     }
 
 This method calls the `[OTSession signalWithType:string:connection:]` method. This
 method sends a message to clients connected to the OpenTok session. Each signal is
-defined by a `type` string identifying the type of message (in this case '"chat")
+defined by a `type` string identifying the type of message (in this case "chat")
 and a string containing the message.
 
 When another client connected to the session (in this app, there is only one) sends
@@ -509,7 +525,7 @@ the connection of client sending the message. If these match, the signal was sen
 local iOS app.
 
 The method calls the `[self logSignalString:]` method which displays the message string in
-the text chat scroll view.
+the text view for chat messages received.
 
 This app uses the OpenTok signaling API to implement text chat. However, you can use the
 signaling API to send messages to other clients (individually or collectively) connected to
@@ -526,10 +542,10 @@ See the following:
   that show more features of the OpenTok iOS SDK
 
 [1]: https://tokbox.com/opentok/libraries/client/ios/
-[2]: https://tokbox.com/opentok/starter-kits/
-[3]: https://tokbox.com/opentok/tutorials/create-session/#media-mode
-[4]: https://tokbox.com/opentok/tutorials/create-token/
-[5]: https://dashboard.tokbox.com
+[2]: https://dashboard.tokbox.com
+[3]: https://tokbox.com/opentok/starter-kits/
+[4]: https://tokbox.com/opentok/tutorials/create-session/#media-mode
+[5]: https://tokbox.com/opentok/tutorials/create-token/
 [6]: https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureDevice_Class
 [7]: https://tokbox.com/opentok/libraries/client/ios/reference/
 [8]: https://tokbox.com/opentok/tutorials/
