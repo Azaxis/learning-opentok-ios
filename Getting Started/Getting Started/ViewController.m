@@ -148,7 +148,7 @@
                action:@selector(swapCamera)
      forControlEvents:UIControlEventTouchUpInside];
 
-    if (START_ARCHIVE_URL) {
+    if (SAMPLE_SERVER_BASE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn addTarget:self
                                action:@selector(startArchive)
@@ -220,7 +220,8 @@
 -(void)startArchive
 {
     _archiveControlBtn.hidden = YES;
-    NSString *fullURL = START_ARCHIVE_URL;
+    NSString *fullURL = SAMPLE_SERVER_BASE_URL;
+    fullURL = [fullURL stringByAppendingString:@"/start/"];
     fullURL = [fullURL stringByAppendingString:_sessionId];
     NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
@@ -241,7 +242,8 @@
 -(void)stopArchive
 {
     _archiveControlBtn.hidden = YES;
-    NSString *fullURL = STOP_ARCHIVE_URL;
+    NSString *fullURL = SAMPLE_SERVER_BASE_URL;
+    fullURL = [fullURL stringByAppendingString:@"/stop/"];
     fullURL = [fullURL stringByAppendingString:_archiveId];
     NSURL *url = [NSURL URLWithString: fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
@@ -260,8 +262,8 @@
 
 -(void)loadArchivePlaybackInBrowser
 {
-    NSString *fullURL = PLAYBACK_ARCHIVE_URL;
-    fullURL = [fullURL stringByAppendingString:@"?archiveId="];
+    NSString *fullURL = SAMPLE_SERVER_BASE_URL;
+    fullURL = [fullURL stringByAppendingString:@"/view/"];
     fullURL = [fullURL stringByAppendingString:_archiveId];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fullURL]];
 }
@@ -335,7 +337,7 @@ archiveStartedWithId:(NSString *)archiveId
     NSLog(@"session archiving started with id:%@ name:%@", archiveId, name);
     _archiveId = archiveId;
     _archiveIndicatorImg.hidden = NO;
-    if (STOP_ARCHIVE_URL) {
+    if (SAMPLE_SERVER_BASE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn setTitle: @"Stop recording" forState:UIControlStateNormal];
         _archiveControlBtn.hidden = NO;
@@ -350,7 +352,7 @@ archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped with id:%@", archiveId);
     _archiveIndicatorImg.hidden = YES;
-    if (PLAYBACK_ARCHIVE_URL) {
+    if (SAMPLE_SERVER_BASE_URL) {
         _archiveControlBtn.hidden = NO;
         [_archiveControlBtn setTitle: @"View recording" forState:UIControlStateNormal];
         [_archiveControlBtn addTarget:self
