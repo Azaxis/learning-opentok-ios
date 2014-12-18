@@ -42,13 +42,15 @@
 {
     if (!API_KEY || !SESSION_ID || !TOKEN) {
         // Get the OpenTok API key and a session ID and token from the web service
-        NSURL *url = [NSURL URLWithString: SESSION_CREDENTIALS_URL];
+        NSString* urlPath = SAMPLE_SERVER_BASE_URL;
+        urlPath = [urlPath stringByAppendingString:@"/session"];
+        NSURL *url = [NSURL URLWithString: urlPath];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:10];
         [request setHTTPMethod: @"GET"];
         
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
             if (error){
-                NSLog(@"Error,%@, URL: %@", [error localizedDescription],SESSION_CREDENTIALS_URL);
+                NSLog(@"Error,%@, URL: %@", [error localizedDescription],urlPath);
             }
             else{
                 NSDictionary *roomInfo = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -57,7 +59,7 @@
                 _sessionId = [roomInfo objectForKey:@"sessionId"];
                 
                 if(!_apiKey || !_token || !_sessionId) {
-                    NSLog(@"Error invalid response from server, URL: %@",SESSION_CREDENTIALS_URL);
+                    NSLog(@"Error invalid response from server, URL: %@",urlPath);
                 } else {
                     [self doConnect];
                 }
