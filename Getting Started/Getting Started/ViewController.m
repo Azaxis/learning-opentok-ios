@@ -41,7 +41,6 @@
 - (void)getSessionCredentials
 {
     if (!API_KEY || !SESSION_ID || !TOKEN) {
-        // Get the OpenTok API key and a session ID and token from the web service
         NSString* urlPath = SAMPLE_SERVER_BASE_URL;
         urlPath = [urlPath stringByAppendingString:@"/session"];
         NSURL *url = [NSURL URLWithString: urlPath];
@@ -94,10 +93,6 @@
 }
 #pragma mark - OpenTok methods
 
-/**
- * Asynchronously begins the session connect process. Some time later, we will
- * expect a delegate method to call us back with the results of this action.
- */
 - (void)doConnect
 {
     // Initialize a new instance of OTSession and begin the connection process.
@@ -113,11 +108,6 @@
     }
 }
 
-/**
- * Sets up an instance of OTPublisher to use with this session. OTPubilsher
- * binds to the device camera and microphone, and will provide A/V streams
- * to the OpenTok session.
- */
 - (void)doPublish
 {
     _publisher = [[OTPublisher alloc]
@@ -151,11 +141,25 @@
 -(void)togglePublisherMic
 {
     _publisher.publishAudio = !_publisher.publishAudio;
+    UIImage *buttonImage;
+    if (_publisher.publishAudio) {
+        buttonImage = [UIImage imageNamed: @"mic-24.png"];
+    } else {
+        buttonImage = [UIImage imageNamed: @"mic_muted-24.png"];
+    }
+    [_publisherAudioBtn setImage:buttonImage forState:UIControlStateNormal];
 }
 
 -(void)toggleSubscriberAudio
 {
     _subscriber.subscribeToAudio = !_subscriber.subscribeToAudio;
+    UIImage *buttonImage;
+    if (_subscriber.subscribeToAudio) {
+        buttonImage = [UIImage imageNamed: @"Subscriber-Speaker-35.png"];
+    } else {
+        buttonImage = [UIImage imageNamed: @"Subscriber-Speaker-Mute-35.png"];
+    }
+    [_subscriberAudioBtn setImage:buttonImage forState:UIControlStateNormal];
 }
 
 -(void)swapCamera
@@ -167,21 +171,11 @@
     }
 }
 
-/**
- * Cleans up the publisher and its view. At this point, the publisher is not
- * attached to the session.
- */
 - (void)cleanupPublisher {
     [_publisher.view removeFromSuperview];
     _publisher = nil;
 }
 
-/**
- * Instantiates a subscriber for the given stream and asynchronously begins the
- * process to begin receiving A/V content for this stream. Unlike doPublish,
- * this method does not add the subscriber to the view hierarchy. Instead, we
- * add the subscriber only after it has connected and begins receiving data.
- */
 - (void)doSubscribe:(OTStream*)stream
 {
     _subscriber = [[OTSubscriber alloc] initWithStream:stream
@@ -195,9 +189,6 @@
     }
 }
 
-/**
- * Cleans the subscriber from the view hierarchy.
- */
 - (void)cleanupSubscriber
 {
     [_subscriber.view removeFromSuperview];
@@ -208,8 +199,6 @@
 
 - (void)sessionDidConnect:(OTSession*)session
 {
-    // We have successfully connected, now start pushing an audio-video stream
-    // to the OpenTok session.
     [self doPublish];
 }
 
@@ -253,11 +242,6 @@ connectionCreated:(OTConnection *)connection
 connectionDestroyed:(OTConnection *)connection
 {
     NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
-    if ([_subscriber.stream.connection.connectionId
-         isEqualToString:connection.connectionId])
-    {
-        [self cleanupSubscriber];
-    }
 }
 
 - (void) session:(OTSession*)session

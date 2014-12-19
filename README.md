@@ -358,6 +358,27 @@ storyboard:
 It also displays the input text field for the text chat. The app hides this field until
 you start viewing the other client's audio-video stream.
 
+If the subscriber's stream is dropped from the session (perhaps the client chose to stop publishing
+or to the implementation of the `[OTSession session:streamDestroyed]` method is called:
+
+    - (void)session:(OTSession*)session
+    streamDestroyed:(OTStream *)stream
+    {
+        NSLog(@"session streamDestroyed (%@)", stream.streamId);
+        if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
+        {
+            [self cleanupSubscriber];
+        }
+    }
+
+The `[self cleanupSubscriber:]` method removes the publisher's view (its video) from its
+superview:
+
+    - (void)cleanupPublisher {
+        [_subscriber.view removeFromSuperview];
+        _subscriber = nil;
+    }
+
 Muting the publisher and subscriber
 -----------------------------------
 
@@ -367,11 +388,13 @@ method is called:
     -(void)togglePublisherMic
     {
         _publisher.publishAudio = !_publisher.publishAudio;
+        UIImage *buttonImage;
         if (_publisher.publishAudio) {
-            [_publisherAudioBtn setTitle: @"Mute mic" forState:UIControlStateNormal];
+            buttonImage = [UIImage imageNamed: @"mic-24.png"];
         } else {
-            [_publisherAudioBtn setTitle: @"Unute mic" forState:UIControlStateNormal];
+            buttonImage = [UIImage imageNamed: @"mic_muted-24.png"];
         }
+        [_publisherAudioBtn setImage:buttonImage forState:UIControlStateNormal];
     }
 
 The `publishAudio` property of the OTPublisher object is set to a Boolean value indicating whether
@@ -385,6 +408,13 @@ clicks the toggle audio button for the Subscriber, the following method is calle
     -(void)toggleSubscriberAudio
     {
         _subscriber.subscribeToAudio = !_subscriber.subscribeToAudio;
+        UIImage *buttonImage;
+        if (_subscriber.subscribeToAudio) {
+            buttonImage = [UIImage imageNamed: @"Subscriber-Speaker-35.png"];
+        } else {
+            buttonImage = [UIImage imageNamed: @"Subscriber-Speaker-Mute-35.png"];
+        }
+        [_subscriberAudioBtn setImage:buttonImage forState:UIControlStateNormal];
     }
 
 Changing the camera used by the publisher
