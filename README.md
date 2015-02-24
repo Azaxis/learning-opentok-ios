@@ -37,8 +37,8 @@ a web service to handle some OpenTok-related API calls.
    learning-opentok-ios repo. Open that file in Xcode.
 
 3. Include the OpenTok.framework in the list of frameworks used by the app.
-   From the OpenTok iOS SDK, you can drag the OpenTok.framework into the list of
-   libraries in the Xcode project explorer for the app.
+   From the OpenTok iOS SDK, you can drag the OpenTok.framework file into the list of
+   frameworks in the Xcode project explorer for the app.
 
 4. Copy the SampleConfig.h file to a Config.h file.
 
