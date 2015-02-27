@@ -29,12 +29,12 @@ Configuring the application
 Before you can test the application, you need to make some settings in Xcode and set up
 a web service to handle some OpenTok-related API calls.
 
-## Adding the OpenTok framework
+### Adding the OpenTok framework
 
 1. Download the [OpenTok iOS SDK] [1].
 
 2. Locate the Getting-Started.xcodeproj file in the Getting Started directory of the
-   learning-opentok-ios repo. Open that file in XCode.
+   learning-opentok-ios repo. Open that file in Xcode.
 
 3. Include the OpenTok.framework in the list of frameworks used by the app.
    From the OpenTok iOS SDK, you can drag the OpenTok.framework file into the list of
@@ -48,10 +48,10 @@ a web service to handle some OpenTok-related API calls.
 
   The next section describes how setting values for the constants defined in this file.
 
-## Setting up the test web service
+### Setting up the test web service
 
-The OpenTok PHP Getting Started repo includes code for setting up a web service that
-handles the following API calls:
+The [Learning OpenTok PHP](https://github.com/opentok/learning-opentok-php) repo includes code for
+setting up a web service that handles the following API calls:
 
 * "/service" -- The iOS client calls this endpoint to get an OpenTok session ID, token, and API key.
 * "/start" -- The iOS client calls this endpoint to start recording the OpenTok session to
@@ -59,9 +59,11 @@ handles the following API calls:
 * "/stop" -- The iOS client calls this endpoint to stop recording the archive.
 * "/view" -- The iOS client load this endpoint in a web browser to display the archive recording.
 
-1. Download the repo and run its code on a PHP-enabled web server. (TODO: Add a link.)
+1. Download the repo and run its code on a PHP-enabled web server. If you do not have a PHP
+   server set up, you can use Heroku to run a remote test server -- see [Automatic deployment to
+   Heroku](https://github.com/opentok/learning-opentok-php#automatic-deployment-to-heroku).
 
-2. In XCode, open the Config.h file (see the previous section). Add the base URL, (such as
+2. In Xcode, open the Config.h file (see the previous section). Add the base URL, (such as
 `@"http://example.com"`) in this line:
 
       define SAMPLE_SERVER_BASE_URL @"http://YOUR-SERVER-URL/"
@@ -92,7 +94,7 @@ Make sure that you have downloaded the OpenTok PHP Getting Started repo and run 
 web server. This sample code handles OpenTok-related web service requests. (See the previous
 section.)
 
-1. In XCode, launch the app in a connected iOS device or in the iOS simulator.
+1. In Xcode, launch the app in a connected iOS device or in the iOS simulator.
 
 2. On first run, the app asks you for access to the camera:
 
